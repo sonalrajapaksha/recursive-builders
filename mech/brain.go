@@ -98,6 +98,12 @@ type Brain struct {
 	stickAt, loseAt    float64
 	snowUntil          float64
 	snowPos            [2]float64
+	fortOn             bool
+	fortSet            bool
+	fortXY             [2]float64
+	fortFace           float64
+	fortAt             float64
+	fortZone           [2]float64
 }
 
 type Params struct {
@@ -156,6 +162,7 @@ type Params struct {
 	LethalK     float64
 	Hunt        bool
 	HuntFloor   float64
+	Fort        float64
 }
 
 func DefaultParams() Params {
@@ -165,6 +172,7 @@ func DefaultParams() Params {
 
 	p.LaserFirst = true
 	p.Hunt, p.HuntFloor = true, 0.28
+	p.Fort = 170
 
 	return p
 }
@@ -359,6 +367,7 @@ func (b *Brain) observe(o *Obs) {
 		}
 	}
 
+	b.fortOn = b.base.Fort > 0 && now >= b.base.Fort && b.pracOn
 	z := &o.Zone
 	if b.holdStart != z.ShrinkStart {
 		b.holdStart = z.ShrinkStart
@@ -803,6 +812,9 @@ func (b *Brain) step(o *Obs, act *Action) {
 		if light != nil && foe.Dist > 50 && me.Energy > 55 && wantLos > 0 {
 			boost = true
 		}
+		if b.fortOn && b.fortSet && hyp(b.fortXY[0]-x, b.fortXY[1]-y) < 30 && foe.LOS && foe.Dist <= b.prefRange(me, foe)+25 {
+			mx, my = 0, 0
+		}
 		mode = "fight"
 		if b.P.FightBoost > 0 && me.Energy > b.P.FightBoost && (laser == nil || laser.Charge <= 0) && (light == nil || me.Energy > 60) {
 			boost = true
@@ -833,6 +845,12 @@ func (b *Brain) step(o *Obs, act *Action) {
 	case zoneShould && zdist > 2:
 		mx, my = b.travel(me, zgx, zgy)
 		mode = "zone"
+	case b.fortOn:
+		fx, fy := b.fortSpot(o)
+		if hyp(fx-x, fy-y) > 2 {
+			mx, my = b.travel(me, fx, fy)
+		}
+		mode = "fort"
 	default:
 		lc := b.chooseLoot(o, hpFrac, danger)
 		if lc != nil {
@@ -1120,6 +1138,8 @@ func (b *Brain) step(o *Obs, act *Action) {
 			aim[0] = b.npcBearing
 		case now-b.lastHurt < 2.5:
 			aim[0] = b.hurtBearing
+		case b.fortOn && b.fortSet && mx == 0 && my == 0:
+			aim[0] = b.fortFace + 0.7*math.Sin(now*0.7)
 		case mx != 0 || my != 0:
 			aim[0] = math.Atan2(my, mx) + 1.15*math.Sin(now*1.3)
 		default:
@@ -1161,6 +1181,9 @@ func (b *Brain) step(o *Obs, act *Action) {
 		break
 	}
 
+	if b.fortOn && mode != "zone" && mode != "escape" {
+		boost = false
+	}
 	act.Move = [2]float64{mx, my}
 	act.Boost = boost && (mx != 0 || my != 0)
 	b.Mode = mode
@@ -2022,6 +2045,73 @@ func (b *Brain) snowGoal(me *Self) (float64, float64, bool) {
 		return b.snowPos[0], b.snowPos[1], true
 	}
 	return 0, 0, false
+}
+
+// fortSpot returns the late-game fortress: a low-exposure reachable cell near
+// the next zone centre, plus the likely approach (longest sightline) to face.
+func (b *Brain) fortSpot(o *Obs) (float64, float64) {
+	z := &o.Zone
+	me := &o.Self
+	changed := !b.fortSet || hyp(b.fortZone[0]-z.NextCenter[0], b.fortZone[1]-z.NextCenter[1]) > 1
+	if changed || b.now-b.fortAt > 20 {
+		b.fortAt = b.now
+		rad := clamp(z.NextRadius*0.55, 8, 70)
+		cost := func(px, py float64) float64 {
+			c := 140*b.W.Exposure(px, py) + 0.15*hyp(px-me.Pos[0], py-me.Pos[1]) + 0.6*hyp(px-z.NextCenter[0], py-z.NextCenter[1])
+			for _, t := range b.tracks {
+				if b.now-t.Seen < 10 && hyp(t.Pos[0]-px, t.Pos[1]-py) < 40 {
+					c += 30
+				}
+			}
+			return c
+		}
+		best, bestC := [2]float64{}, math.Inf(1)
+		for k := 0; k < 48; k++ {
+			a := b.rng.Float64() * 2 * math.Pi
+			r := math.Sqrt(b.rng.Float64()) * rad
+			px, py := z.NextCenter[0]+math.Cos(a)*r, z.NextCenter[1]+math.Sin(a)*r
+			if !b.W.InBounds(px, py) || !b.W.Free(px, py) || !b.W.Reachable(px, py) {
+				continue
+			}
+			if c := cost(px, py); c < bestC {
+				best, bestC = [2]float64{px, py}, c
+			}
+		}
+		if !math.IsInf(bestC, 1) && (changed || bestC < cost(b.fortXY[0], b.fortXY[1])-15) {
+			b.fortXY, b.fortSet, b.fortZone = best, true, z.NextCenter
+			b.fortFace = b.sightFace(b.fortXY[0], b.fortXY[1])
+		}
+	}
+	if !b.fortSet {
+		return me.Pos[0], me.Pos[1]
+	}
+	return b.fortXY[0], b.fortXY[1]
+}
+
+// sightFace is the bearing with the longest (smoothed) open sightline.
+func (b *Brain) sightFace(x, y float64) float64 {
+	zz := b.W.WalkAt(x, y) + 7
+	var ln [24]float64
+	for k := range ln {
+		a := float64(k) * math.Pi / 12
+		c, s := math.Cos(a), math.Sin(a)
+		d := 2.5
+		for ; d < 200; d += 2.5 {
+			px, py := x+c*d, y+s*d
+			if !b.W.InBounds(px, py) || b.W.solidRaster(px, py, zz) {
+				break
+			}
+		}
+		ln[k] = d
+	}
+	bk, bv := 0, -1.0
+	for k := range ln {
+		v := ln[k] + 0.5*(ln[(k+1)%24]+ln[(k+23)%24])
+		if v > bv {
+			bk, bv = k, v
+		}
+	}
+	return float64(bk) * math.Pi / 12
 }
 
 func squadParams(p Params) Params {
