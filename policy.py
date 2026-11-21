@@ -788,6 +788,8 @@ class Policy:
         muzzle = [pos[0], pos[1], pos[2] + mz]
         eye = [pos[0], pos[1], pos[2] + eye_h]
         los = self._los(eye, tc)
+        ux_, uy_ = unit(tp[0] - pos[0], tp[1] - pos[1])
+        v_lat = abs(tv[0] * -uy_ + tv[1] * ux_)   # target speed across our line of fire
 
         def aim_at(point):
             dh = hyp(point[0] - muzzle[0], point[1] - muzzle[1])
@@ -809,7 +811,8 @@ class Policy:
         mode = "gun"
         if light and d <= _num(_g(light[1], "stats", "range"), 45.0) * 0.92 and energy >= 8 and los:
             mode = "lightning"
-        elif laser and los and 10 < d <= _num(_g(laser[1], "stats", "range"), 280.0) - 6 and not (
+        elif laser and los and 10 < d <= _num(_g(laser[1], "stats", "range"), 280.0) - 6 and (
+                v_lat < 2.6 or _num(laser[1].get("charge"), 0) > 0 or d < 25) and not (
                 "lightning" in (target.get("weapons") or []) and d < 60 and _num(laser[1].get("charge"), 0) <= 0) and (
                 _num(laser[1].get("charge"), 0) > 0 or _num(laser[1].get("cooldown"), 0) <= 0.7):
             mode = "laser"
@@ -878,9 +881,11 @@ class Policy:
                 if ch > 0:
                     # release when fully charged and lined up (or if it has overheld)
                     rel = (ch >= full - 0.05 and e < max(tol, 0.03)) or ch >= full + 0.8
+                    if v_lat > 6.0 and ch >= 0.3 and e < max(tol, 0.03):
+                        rel = True   # target started strafing mid-charge: fire the partial charge now, do not telegraph more
                     setf("laser", not rel)
                 else:
-                    setf("laser", e < 0.25)
+                    setf("laser", e < 0.08)   # begin the (visible, dodgeable) charge only once lined up
             else:
                 setf("laser", False)   # release (or never start) when not in laser mode
         return aim, fire
