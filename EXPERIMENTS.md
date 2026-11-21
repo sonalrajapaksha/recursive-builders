@@ -18,3 +18,4 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E14 | official combo1 (24f35d6) = aggressor2 + fight-quality | 4.25 vs 4.31: no gain; tuning-level changes plateau ~4.3 (noise ~±0.1). Need structural gains. |
 | E15 | combo2 (bff0082) = combo1 + aggressor3 + gearup; docker check run | queued next |
 | E16 | official duelist (5a8d567) = combo1 + peek-and-heal | 4.10 vs 4.25: no gain (slightly worse). Retreat-to-heal not the lever; drop it. |
+| E17 | official combo2 (bff0082) = combo1 + aggressor3 (early zone exit, chase weak) + gearup (loot memory, boost >60m) | 4.54 BEST (+0.23 vs combo1). Leaderboard now >200 teams, top ~5.96; we are ~65th-70th; top-20 line likely ~5.5-5.6 (moving). Small merged gains stack. |
