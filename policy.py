@@ -452,7 +452,7 @@ class Policy:
         if gun:
             gs = gun[1]
             mag = _num(_g(gs, "stats", "mag"), _num(_g(self.W, "gun", "mag"), 12))
-            if _num(gs.get("reload"), 0) <= 0 and (_num(gs.get("ammo"), mag) <= 0 or (target is None and _num(gs.get("ammo"), mag) < mag * 0.6)):
+            if _num(gs.get("reload"), 0) <= 0 and (_num(gs.get("ammo"), mag) <= 0 or (target is None and e0 is None and _num(gs.get("ammo"), mag) < mag * 0.6)):
                 reload_now = True
         if target is not None:
             aim, fire = self._aim_fire(target, ttype, pos, mz, eye_h, aim_now, wk, energy, t)

@@ -335,6 +335,14 @@ def test_no_laser_charge_into_lightning_holder():
     assert a["fire"][1], a
 
 
+def test_no_early_reload_with_enemy_visible():
+    o = base_obs()
+    o["self"]["weapons"] = [{"kind": "gun", "cooldown": 0, "ammo": 4, "reload": 0, "stats": HELLO["config"]["weapons"]["gun"]}, None]
+    assert Policy(HELLO, StubNav()).act(o).get("reload")
+    o["mechs"] = [enemy(5, 150, 0)]
+    assert not Policy(HELLO, StubNav()).act(o).get("reload")
+
+
 if __name__ == "__main__":
     fails = 0
     for name, fn in sorted(globals().items()):
