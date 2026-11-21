@@ -20,3 +20,4 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 15 | 74472114cef8bea5ee11a6ed37f924b46cd13127 (giddy-base: MIT Go bot justnau/giddygiddyboy-mech-royale@edbdb6b, unchanged, license kept) | user chose it as new strategy base; docker amd64 check PASS p99 5.8ms | scored, receipt BB-31B21D8B | 6.10 (now final entry) |
 | 16 | 53e6cd3867d2819ef88d388d906d7366b6eaccc2 (gx-kill-zonecenter, giddy-base + late-game zone-center bias) | docker PASS | scored, receipt BB-0A6AABA8 | 6.10 (identical to giddy-base: no practice effect) |
 | 17 | 617ea065014b4a8720a24c4957c4b47590058394 (gx-cube-radius, giddy-base + visible-cube chase radius 63->110m, cubeV 100) | docker PASS | scored, receipt BB-2B752C79 | 6.04 (slightly below base; dropped) |
+| 18 | f92c6fdf1aedbac6e2ea0e2122277d14d56cf1db (bold-cube-lord: Econ loot, drops, 90s farming tour, armor-first upgrades) | docker PASS | received, receipt BB-78FA0F43-ish, scoring | pending |
