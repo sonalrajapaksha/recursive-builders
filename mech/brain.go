@@ -96,6 +96,7 @@ type Brain struct {
 	otherDead          int
 	stickID            int
 	stickAt, loseAt    float64
+	amb                ambushSt
 }
 
 type Params struct {
@@ -152,6 +153,7 @@ type Params struct {
 	SpeedUp     bool
 	Backstab    float64
 	LethalK     float64
+	LaserAmbush bool
 }
 
 func DefaultParams() Params {
@@ -160,6 +162,7 @@ func DefaultParams() Params {
 		Peek: true, LaserFirst: false, CrowdHide: true, Practice: true}
 
 	p.LaserFirst = true
+	p.LaserAmbush = true
 
 	return p
 }
@@ -673,6 +676,8 @@ func (b *Brain) step(o *Obs, act *Action) {
 		}
 	}
 
+	ambOn := b.ambushUpdate(o, seen, target, hpFrac, late)
+
 	var mx, my float64
 	boost := false
 	mode := "idle"
@@ -700,6 +705,9 @@ func (b *Brain) step(o *Obs, act *Action) {
 		mx, my = b.travel(me, zgx, zgy)
 		boost = (!me.InZone || now+tNeed >= deadline) && me.Energy > 5
 		mode = "zone"
+	case ambOn && !b.retreat:
+		mx, my = b.ambushMove(me)
+		mode = "ambush"
 	case b.retreat && !finishing && !late:
 		if b.coverMove(o, seen, &mx, &my) {
 			boost = me.Energy > 10 && (mx != 0 || my != 0)
@@ -1088,6 +1096,9 @@ func (b *Brain) step(o *Obs, act *Action) {
 			aim[0] = me.Aim[0] + 0.35
 		}
 		aim[1] = 0
+	}
+	if ambOn && mode == "ambush" {
+		b.ambushFire(o, &aim, act)
 	}
 	aim[1] = clamp(aim[1], st.MinPitch, st.MaxPitch)
 	act.Aim = &aim
