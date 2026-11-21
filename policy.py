@@ -509,6 +509,9 @@ class Policy:
             else:
                 goal = (pp[0], pp[1])
                 mode = "loot"
+        # opening: grab the first weapon before duelling anything not yet on us
+        opening_loot = bool(t < 35 and goal is not None and mode == "loot" and not provoked
+                            and (e0 is None or e0["_d"] > 55) and hpf > 0.6)
         # drop a mortar when a laser holder is in sight (cook-off), only if not taking
         if "take" not in act and "mortar" in wk and any("laser" in (e.get("weapons") or []) and e["_d"] < 260 for e in vis):
             act["drop"] = wk["mortar"][0]
@@ -538,6 +541,9 @@ class Policy:
             mx, my = unit(ax * 1.0 + gx * 0.35 + px * 0.35 * self.strafe, ay * 1.0 + gy * 0.35 + py * 0.35 * self.strafe)
             move_dir = (mx, my)
             boost_pref = True
+        elif opening_loot:
+            mode = "loot"
+            boost_pref = hyp(goal[0] - pos[0], goal[1] - pos[1]) > 25
         elif target is not None and ttype in ("mech", "npc", "crate") and (engaged or farm_target is not None):
             mode = "fight" if ttype == "mech" else "farm"
             tp = _vec(target["pos"])
