@@ -2010,7 +2010,7 @@ func lordParams(p Params) Params {
 	p.Tour = 90
 	p.LootRadius = 200
 	p.EconSafe = 0
-	p.LaserOnly = false
+	p.LaserOnly = true
 	return p
 }
 
