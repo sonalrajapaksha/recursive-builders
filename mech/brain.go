@@ -1724,12 +1724,12 @@ func (b *Brain) chooseLoot(o *Obs, hpFrac float64, danger bool) *lootChoice {
 			consider("pickup", p.ID, p.Pos, v)
 		}
 	}
-	cubeV := 75.0
+	cubeV := 100.0
 	if me.Cubes >= b.cubeCap() {
 		cubeV = 25
 	}
 	for _, c := range b.cubes {
-		if hyp(c.Pos[0]-x, c.Pos[1]-y) < math.Max(60, b.P.LootRadius*0.7) {
+		if hyp(c.Pos[0]-x, c.Pos[1]-y) < math.Max(110, b.P.LootRadius*0.7) {
 			consider("cube", c.ID, c.Pos, cubeV)
 		}
 	}
