@@ -396,6 +396,9 @@ class Policy:
                 def score(e):
                     s = e["_d"] - (30 if e.get("id") == self.target_id else 0)
                     s += 0.12 * _num(e.get("hp"), mhp)
+                    ea = _vec(e.get("aim"), 2)
+                    if ea and abs(wrap(math.atan2(pos[1] - e["pos"][1], pos[0] - e["pos"][0]) - ea[0])) > math.pi / 2:
+                        s -= 25   # its back is to us: rear_mult x1.5 damage
                     return s
                 tgt = min(pool, key=score)
             if tgt is not None:
@@ -782,7 +785,8 @@ class Policy:
         mode = "gun"
         if light and d <= _num(_g(light[1], "stats", "range"), 45.0) * 0.92 and energy >= 8 and los:
             mode = "lightning"
-        elif laser and los and 10 < d <= _num(_g(laser[1], "stats", "range"), 280.0) - 6 and (
+        elif laser and los and 10 < d <= _num(_g(laser[1], "stats", "range"), 280.0) - 6 and not (
+                "lightning" in (target.get("weapons") or []) and d < 60 and _num(laser[1].get("charge"), 0) <= 0) and (
                 _num(laser[1].get("charge"), 0) > 0 or _num(laser[1].get("cooldown"), 0) <= 0.7):
             mode = "laser"
         elif mort and 22 < d < 200 and _num(mort[1].get("cooldown"), 0) <= 0.6 and (not gun or d > 55 or not los):

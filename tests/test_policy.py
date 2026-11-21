@@ -312,6 +312,29 @@ def test_mortar_high_arc_when_blocked():
     assert a["aim"][1] > 0.5, a
 
 
+def test_prefers_rear_exposed_target():
+    o = base_obs()
+    # equal distance/hp: A faces us (aim pi), B has its back to us (aim 0)
+    o["mechs"] = [enemy(5, 50, 3, aim=(math.pi, 0)), enemy(6, 50, -3, aim=(0, 0))]
+    o["events"] = [{"type": "damaged", "amount": 45, "weapon": "gun", "bearing": 0.0, "by": 5}]
+    p = Policy(HELLO, StubNav())
+    p.act(o)
+    assert p.target_id == 6, p.target_id
+
+
+def test_no_laser_charge_into_lightning_holder():
+    o = base_obs()
+    o["self"]["weapons"][1] = {"kind": "laser", "cooldown": 0, "charge": 0,
+                               "stats": HELLO["config"]["weapons"]["laser"]}
+    o["self"]["aim"] = [0.0, 0.0]
+    o["mechs"] = [enemy(5, 40, 0, weapons=("gun", "lightning"))]
+    a = Policy(HELLO, StubNav()).act(o)
+    assert not a["fire"][1], a   # lightning shorts a laser; use the gun at this range
+    o["mechs"] = [enemy(5, 40, 0, weapons=("gun",))]
+    a = Policy(HELLO, StubNav()).act(o)
+    assert a["fire"][1], a
+
+
 if __name__ == "__main__":
     fails = 0
     for name, fn in sorted(globals().items()):
