@@ -84,8 +84,8 @@ def zone_now(z, t):
 
 
 UPGRADE_WEIGHT = {
-    "armor": 8.5, "plating": 8.5, "nanites": 6, "servos": 6, "sensors": 5, "laser_damage": 9,
-    "laser_charge": 6, "gyros": 5.5, "gun_rate": 8, "gun_damage": 8, "jets": 5, "lightning_efficiency": 6,
+    "armor": 9.5, "plating": 10.5, "nanites": 8, "servos": 6, "sensors": 4, "laser_damage": 8,
+    "laser_charge": 6, "gyros": 5.5, "gun_rate": 7.5, "gun_damage": 7.5, "jets": 5, "lightning_efficiency": 6,
     "lightning_range": 6, "mortar_reload": 5, "gun_mag": 4, "gun_velocity": 4, "reactor": 4, "capacitor": 4,
     "mortar_splash": 3.5, "mortar_velocity": 4, "lightning_chain": 4, "laser_pierce": 3,
 }
