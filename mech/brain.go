@@ -708,7 +708,7 @@ func (b *Brain) step(o *Obs, act *Action) {
 	zoneShould := now+tNeed+14 >= deadline
 
 	var chase *Track
-	if b.P.Hunt && foe == nil && hpFrac > b.P.HuntFloor+0.1 {
+	if b.P.Hunt && !b.fortOn && foe == nil && hpFrac > b.P.HuntFloor+0.1 {
 		for _, t := range b.tracks {
 			age := now - t.Seen
 			if age <= 0 || age > 6 || t.HP > 1.5*me.HP {
