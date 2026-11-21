@@ -152,6 +152,9 @@ type Params struct {
 	SpeedUp     bool
 	Backstab    float64
 	LethalK     float64
+	Lord        bool
+	Tour        float64
+	LaserOnly   bool
 }
 
 func DefaultParams() Params {
@@ -161,7 +164,7 @@ func DefaultParams() Params {
 
 	p.LaserFirst = true
 
-	return p
+	return lordParams(p)
 }
 
 func NewBrain(h *Hello, w *World) *Brain {
@@ -463,8 +466,17 @@ var upgradeOrderSpeed = []string{
 	"mortar_reload", "mortar_splash", "mortar_velocity", "sensors", "laser_pierce",
 }
 
-func pickUpgrade(of *Offer, laserUp, nanoUp, speedUp bool) int {
+var upgradeOrderLord = []string{
+	"armor", "plating", "nanites", "servos", "laser_damage", "laser_charge", "gun_damage", "gun_rate", "jets", "reactor",
+	"lightning_efficiency", "lightning_range", "gun_mag", "gun_velocity", "gyros", "lightning_chain", "capacitor",
+	"mortar_reload", "mortar_splash", "mortar_velocity", "sensors", "laser_pierce",
+}
+
+func pickUpgrade(of *Offer, laserUp, nanoUp, speedUp, lord bool) int {
 	order := upgradeOrder
+	if lord {
+		order = upgradeOrderLord
+	}
 	if laserUp {
 		order = upgradeOrderLaser
 	}
@@ -473,6 +485,9 @@ func pickUpgrade(of *Offer, laserUp, nanoUp, speedUp bool) int {
 	}
 	if speedUp {
 		order = upgradeOrderSpeed
+	}
+	if lord {
+		order = upgradeOrderLord
 	}
 	best, bestRank := 0, 1<<30
 	for i, c := range of.Choices {
@@ -503,7 +518,7 @@ func (b *Brain) step(o *Obs, act *Action) {
 	hpFrac := me.HP / math.Max(1, me.MaxHP)
 
 	if o.Offer != nil && len(o.Offer.Choices) > 0 {
-		p := pickUpgrade(o.Offer, b.P.LaserUp, b.P.NanoUp, b.P.SpeedUp)
+		p := pickUpgrade(o.Offer, b.P.LaserUp, b.P.NanoUp, b.P.SpeedUp, b.P.Lord)
 		act.Pick = &p
 	}
 
@@ -570,6 +585,9 @@ func (b *Brain) step(o *Obs, act *Action) {
 			t.Engage = true
 		case aimed && t.Dist < 190:
 			t.Engage = true
+		}
+		if b.P.Tour > 0 && now < b.P.Tour && now-t.HitMe > 4 && t.Dist > 30 && o.Alive > 3 {
+			t.Engage = false
 		}
 		if t.Engage && !t.LOS && t.Dist < maxT && (hidden == nil || t.Dist < hidden.Dist) {
 			hidden = t
@@ -1182,6 +1200,9 @@ func (b *Brain) wantPickup(me *Self, kind string) bool {
 	if i, _ := hasWeapon(me.Weapons, kind); i >= 0 {
 		return false
 	}
+	if b.P.LaserOnly && kind != "laser" {
+		return false
+	}
 	if kind == "mortar" && b.P.NoMortar {
 		return false
 	}
@@ -1690,7 +1711,7 @@ func (b *Brain) chooseLoot(o *Obs, hpFrac float64, danger bool) *lootChoice {
 		for i := range o.Drops {
 			d := &o.Drops[i]
 			if b.P.UseDrops && !hurt && hyp(d.Pos[0]-x, d.Pos[1]-y)/me.Stats.WalkSpeed < d.LandsIn+25 {
-				consider("drop", d.ID, d.Pos, 170)
+				consider("drop", d.ID, d.Pos, 600)
 			}
 		}
 		if best == nil {
@@ -1974,6 +1995,22 @@ func squadParams(p Params) Params {
 	p.HPw = 0.18
 	p.LethalK = 0.75
 
+	return lordParams(p)
+}
+
+// lordParams: Cube Lord doctrine. Cubes are the objective: farm crates, cubes,
+// drones and every supply drop; fight only when hit or cornered during the tour.
+func lordParams(p Params) Params {
+	p.Lord = true
+	p.Econ = true
+	p.UseDrops = true
+	p.FarmNPC = true
+	p.CrateUntil = 1e9
+	p.CubeGoal = 45
+	p.Tour = 90
+	p.LootRadius = 200
+	p.EconSafe = 0
+	p.LaserOnly = false
 	return p
 }
 
