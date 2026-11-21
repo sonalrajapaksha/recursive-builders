@@ -7,7 +7,7 @@ A=${ARENA:-/Users/sonalrajapaksha/Documents/buildathon/recursive-builders/arena}
 W=/tmp/ext/tv-$NAME
 git -C "$ROOT" worktree remove --force "$W" 2>/dev/null || true
 git -C "$ROOT" branch -D tv-$NAME 2>/dev/null || true
-git -C "$ROOT" worktree add -q -b tv-$NAME "$W" tune-base
+git -C "$ROOT" worktree add -q -b tv-$NAME "$W" "${BASE:-tune-base}"
 echo "$JSON" > "$W/mech/tune.json"
 cd "$W"
 docker build --platform linux/amd64 -q -t tv-$NAME . >/dev/null
