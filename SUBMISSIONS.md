@@ -16,3 +16,5 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 12 | 3f03885c456f5e6482b715ef4a8846084ce64171 (branch lightning-rush = combo2 + lightning-first doctrine, close to <=31m) | 2026-11-22 00:07 NZDT | scored (BB-015EF900) | 4.13 (worse than combo2 4.54) |
 | 13 | bff00824a32cc2c4f275281839cc2d9e0a0874f5 (combo2 REPEAT to measure run-to-run noise) | 2026-11-22 00:09 NZDT | received, receipt BB-4EB38F11, scoring | pending |
 | 14 | 3734583f2d8082be2379722c0743aab9aecd3e08 (abl-reload) | single-change ablation of combo2 | received, receipt BB-07B91792, scoring | pending |
+| 14 result | abl-reload 3734583 | 4.50 (receipt BB-D7B91790, took ~30 min stuck in Fetching) | neutral vs combo2 ~4.58 |
+| 15 | 74472114cef8bea5ee11a6ed37f924b46cd13127 (giddy-base: MIT Go bot justnau/giddygiddyboy-mech-royale@edbdb6b, unchanged, license kept) | user chose it as new strategy base; docker amd64 check PASS p99 5.8ms | received, receipt BB-31B21D88, scoring | pending |
