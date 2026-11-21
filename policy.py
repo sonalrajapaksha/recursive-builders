@@ -84,8 +84,8 @@ def zone_now(z, t):
 
 
 UPGRADE_WEIGHT = {
-    "armor": 9, "plating": 8, "nanites": 7.5, "servos": 6.5, "sensors": 6.5, "laser_damage": 7,
-    "laser_charge": 6, "gyros": 5.5, "gun_rate": 5.5, "gun_damage": 5, "jets": 5, "lightning_efficiency": 6,
+    "armor": 8.5, "plating": 8.5, "nanites": 6, "servos": 6, "sensors": 5, "laser_damage": 9,
+    "laser_charge": 6, "gyros": 5.5, "gun_rate": 8, "gun_damage": 8, "jets": 5, "lightning_efficiency": 6,
     "lightning_range": 6, "mortar_reload": 5, "gun_mag": 4, "gun_velocity": 4, "reactor": 4, "capacitor": 4,
     "mortar_splash": 3.5, "mortar_velocity": 4, "lightning_chain": 4, "laser_pierce": 3,
 }
@@ -380,8 +380,6 @@ class Policy:
                 flee = True
             elif hpf < 0.35 and ehp > 0.5 * hp:
                 flee = True
-            elif hpf < 0.55 and ehp > 1.3 * hp:
-                flee = True
         if flee and e0 and e0["_d"] < 22 and hpf > 0.2 and n_close < 3:
             flee = False  # cornered at melee range: fight back
 
@@ -397,25 +395,25 @@ class Policy:
             if pool:
                 def score(e):
                     s = e["_d"] - (30 if e.get("id") == self.target_id else 0)
-                    s += 0.05 * _num(e.get("hp"), mhp)
+                    s += 0.12 * _num(e.get("hp"), mhp)
                     return s
                 tgt = min(pool, key=score)
             if tgt is not None:
                 ehp_f = _num(tgt.get("hp"), mhp) / max(_num(tgt.get("max_hp"), mhp), 1)
-                engaged = provoked or tgt["_d"] < 75 or (ehp_f < 0.4 and tgt["_d"] < 130) or bool(tgt.get("charging"))
+                engaged = provoked or tgt["_d"] < 110 or (ehp_f < 0.5 and tgt["_d"] < 170) or bool(tgt.get("charging"))
                 if engaged and (not flee or provoked):
                     target, ttype = tgt, "mech"
-        farm_ok = (target is None and not flee and not zone_urgent and hpf > 0.6 and not vis)
+        farm_ok = (target is None and not flee and not zone_urgent and hpf > 0.5 and not [e for e in vis if e["_d"] < 70])
         farm_target = None
         if farm_ok:
             for n in npcs:
-                if n["_d"] < 60:
+                if n["_d"] < 130:
                     farm_target = n
                     break
             if farm_target is None:
                 for c in obs.get("crates") or []:
                     cp = _vec(c.get("pos"))
-                    if cp and hyp(cp[0] - pos[0], cp[1] - pos[1]) < 45 and zone_ok(cp):
+                    if cp and hyp(cp[0] - pos[0], cp[1] - pos[1]) < 130 and zone_ok(cp):
                         farm_target = {"pos": cp, "vel": [0, 0, 0], "kind": "crate", "id": c.get("id"),
                                        "_d": hyp(cp[0] - pos[0], cp[1] - pos[1])}
                         break
@@ -458,7 +456,7 @@ class Policy:
                     continue
                 dxy = hyp(pp[0] - pos[0], pp[1] - pos[1])
                 dz = abs(pp[2] - pos[2])
-                if dz > 6 or dxy > 90 or not zone_ok(pp, 4.0):
+                if dz > 6 or dxy > 150 or not zone_ok(pp, 4.0):
                     continue
                 k = p["kind"]
                 v = self._weapon_value(k, t)
@@ -531,6 +529,8 @@ class Policy:
             move_dir = unit(ux * rad + px * tang * self.strafe, uy * rad + py * tang * self.strafe)
             if hostile_near or d < 25:
                 boost_pref = False
+            elif ttype != "mech" and d > pref + 30:
+                boost_pref = True
         elif goal is None:
             # cubes, supply drop, then hide
             safe_to_wander = not vis and hpf > 0.35 and not provoked
@@ -544,14 +544,14 @@ class Policy:
                 boost_pref = drop[2]
             else:
                 cube = None
-                if safe_to_wander or (vis and e0["_d"] > 90 and hpf > 0.6):
+                if safe_to_wander or (vis and e0["_d"] > 70 and hpf > 0.5):
                     best = 1e9
                     for c in obs.get("cubes") or []:
                         cp = _vec(c.get("pos"))
                         if not cp:
                             continue
                         dd = hyp(cp[0] - pos[0], cp[1] - pos[1])
-                        if dd < 55 and abs(cp[2] - pos[2]) < 7 and zone_ok(cp, 4.0) and dd < best:
+                        if dd < 110 and abs(cp[2] - pos[2]) < 7 and zone_ok(cp, 4.0) and dd < best:
                             best, cube = dd, cp
                 if cube is not None:
                     mode = "cube"
@@ -580,7 +580,7 @@ class Policy:
         if goal is not None:
             mv, jump, steer_boost = self._steer(pos, goal, vel, tick)
             d_goal = hyp(goal[0] - pos[0], goal[1] - pos[1])
-            if d_goal > 80 and energy > 55 and mode in ("zone", "hide", "drop", "loot", "cube"):
+            if d_goal > 30 and energy > 35 and mode in ("zone", "hide", "drop", "loot", "cube"):
                 boost_pref = True
             if d_goal < 6:
                 s = d_goal / 6.0
@@ -663,11 +663,11 @@ class Policy:
             if (max(dist - r, 0) / max(walk, 1.0)) > lands + 14:
                 continue
             contested = [e for e in enemies if hyp(e["pos"][0] - dp[0], e["pos"][1] - dp[1]) < r + 20]
-            if contested and hpf < 0.7:
+            if len(contested) >= 2 and hpf < 0.7:
                 continue
             holder = d.get("holder")
             me_id = _g(obs, "self", "id")
-            if holder is not None and holder != me_id and len(contested) > 0 and hpf < 0.9:
+            if holder is not None and holder != me_id and len(contested) > 1 and hpf < 0.9:
                 continue
             if best is None or dist < best[0]:
                 inside = dist < r - 1.5 and lands <= 0
