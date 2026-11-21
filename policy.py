@@ -340,9 +340,10 @@ class Policy:
         nr = _num(zone.get("next_radius"), cr)
         d_next = hyp(pos[0] - nc[0], pos[1] - nc[1])
         s_start = _num(zone.get("shrink_start"), 1e9)
-        lead = max(0.0, d_next - nr * 0.6) / max(walk, 1.0) + 6.0
+        late = nr <= 140   # dps 60+: never be caught outside; arrive early and well inside
+        lead = max(0.0, d_next - nr * 0.6) / max(walk, 1.0) + (20.0 if late else 6.0)
         phase_active = t >= s_start - lead
-        inside_next = d_next < nr - 12
+        inside_next = d_next < nr - (22 if late else 12)
         inside_now = hyp(pos[0] - cx, pos[1] - cy) < cr - 6
         zone_urgent = (not me.get("in_zone", True)) or (not inside_now) or (phase_active and not inside_next)
 
@@ -400,7 +401,7 @@ class Policy:
                 tgt = min(pool, key=score)
             if tgt is not None:
                 ehp_f = _num(tgt.get("hp"), mhp) / max(_num(tgt.get("max_hp"), mhp), 1)
-                engaged = provoked or tgt["_d"] < 110 or (ehp_f < 0.5 and tgt["_d"] < 170) or bool(tgt.get("charging"))
+                engaged = provoked or tgt["_d"] < 110 or (ehp_f < 0.4 and tgt["_d"] < 260) or bool(tgt.get("charging"))
                 if engaged and (not flee or provoked):
                     target, ttype = tgt, "mech"
         farm_ok = (target is None and not flee and not zone_urgent and hpf > 0.5 and not [e for e in vis if e["_d"] < 70])
@@ -531,6 +532,9 @@ class Policy:
                 boost_pref = False
             elif ttype != "mech" and d > pref + 30:
                 boost_pref = True
+            elif ttype == "mech" and d > pref + 30 and energy > 40 and (
+                    _num(target.get("hp"), mhp) < 0.4 * _num(target.get("max_hp"), mhp) and hpf > 0.5):
+                boost_pref = True   # third-party: run down a weakened mech
         elif goal is None:
             # cubes, supply drop, then hide
             safe_to_wander = not vis and hpf > 0.35 and not provoked
