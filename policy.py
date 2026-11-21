@@ -235,6 +235,26 @@ class Policy:
                 out.append(it)
         return out
 
+    def _sheltered(self, a, nc, nr):
+        """Nudge a hide anchor to a nearby walkable spot with lower exposure (nav.exposure), staying inside the circle."""
+        ex = getattr(self.nav, "exposure", None) if self.nav_ok else None
+        if ex is None:
+            return a
+        try:
+            best, bs = a, ex(a[0], a[1])
+            for dist in (10.0, 20.0, 30.0):
+                for k in range(8):
+                    ang = k * TAU / 8
+                    x, y = a[0] + math.cos(ang) * dist, a[1] + math.sin(ang) * dist
+                    if hyp(x - nc[0], y - nc[1]) > nr * 0.7 or self.nav.blocked(x, y):
+                        continue
+                    sc = ex(x, y) + 0.004 * dist
+                    if sc < bs - 0.05:
+                        best, bs = [x, y], sc
+            return best
+        except Exception:
+            return a
+
     # ------------------------------------------------------------------ offers / loot values
     def _pick(self, offer, me):
         choices = offer.get("choices") or []
@@ -376,6 +396,7 @@ class Policy:
         if key != self.anchor_key or t - self.anchor_t > 3.0:
             self.anchor = self._safe_point(nc, max(nr * 0.55, 3.0), pos)
             self.anchor_key, self.anchor_t = key, t
+            self.anchor = self._sheltered(self.anchor, nc, nr)
         anchor = self.anchor
 
         # ---- weapons
@@ -393,6 +414,7 @@ class Policy:
         n_close = len([e for e in vis if e["_d"] < 100])
         e0 = vis[0] if vis else None
         provoked = t < self.prov_until
+        known_near = bool(vis) or any(t - m["t"] < 10 and hyp(m["pos"][0] - pos[0], m["pos"][1] - pos[1]) < 160 for m in self.mem.values())
         flee = False
         if e0:
             ehp = _num(e0.get("hp"), mhp)
@@ -604,6 +626,10 @@ class Policy:
         # ---- compose movement
         jump = False
         steer_boost = False
+        if self.nav_ok and self.nav is not None:
+            # no enemy known near and not rushing: let nav prefer sheltered routes (never when fleeing / zone-urgent)
+            self.nav.calm = bool(mode in ("loot", "cube", "drop", "hide", "farm") and not zone_urgent and not flee
+                                 and not vis and not provoked and not known_near)
         if goal is not None:
             mv, jump, steer_boost = self._steer(pos, goal, vel, tick)
             d_goal = hyp(goal[0] - pos[0], goal[1] - pos[1])

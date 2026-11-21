@@ -195,5 +195,58 @@ class TestNav(unittest.TestCase):
         self.assertLess(lat[494] * 1000, 10.0)
 
 
+class TestExposure(unittest.TestCase):
+    def test_load_budget(self):
+        self.assertLess(LOAD, 3.0, LOAD)
+        self.assertLess(NAV.expo_ms, 2500)
+
+    def test_low_beside_buildings(self):
+        cells = [NAV.exposure(NAV.ex0 + (i + .5) * 16, NAV.ey0 + (j + .5) * 16)
+                 for i in range(NAV.ecx) for j in range(NAV.ecy) if NAV.expo[j * NAV.ecx + i] != 255]
+        cells.sort()
+        median = cells[len(cells) // 2]
+        near = []
+        for p in NAV.prisms:
+            if p[1] - p[0] > 8:
+                cx, cy = centroid(p)
+                r = max(p[5] - p[3], p[6] - p[4]) / 2 + 5
+                for k in range(4):
+                    x, y = cx + math.cos(k * math.pi / 2) * r, cy + math.sin(k * math.pi / 2) * r
+                    if not NAV.blocked(x, y):
+                        near.append(NAV.exposure(x, y))
+        self.assertGreater(len(near), 100)
+        self.assertLess(sum(near) / len(near), median - 0.1)
+        self.assertLess(cells[0], 0.2)
+        self.assertGreater(cells[-1], 0.9)
+
+    def test_calm_route_detour_bounded(self):
+        rnd = random.Random(3)
+        pts = []
+        while len(pts) < 40:
+            x, y = rnd.uniform(-400, 450), rnd.uniform(-250, 330)
+            if not NAV.blocked(x, y):
+                pts.append((x, y))
+
+        def length(p):
+            return sum(math.dist(p[i], p[i + 1]) for i in range(len(p) - 1))
+
+        def expo(p):
+            return sum(NAV.exposure(*q) for q in p) / len(p)
+        worse = 0
+        try:
+            for a, b in zip(pts[::2], pts[1::2]):
+                NAV.calm = False
+                p0 = NAV.path(a, b)
+                NAV.calm = True
+                p1 = NAV.path(a, b)
+                if not p0 or not p1:
+                    continue
+                self.assertLessEqual(length(p1), 1.36 * length(p0) + 6.0)
+                worse += expo(p1) > expo(p0) + 0.03
+        finally:
+            NAV.calm = False
+        self.assertLessEqual(worse, 2)
+
+
 if __name__ == "__main__":
     unittest.main()

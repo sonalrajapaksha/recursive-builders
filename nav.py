@@ -17,6 +17,9 @@ _T01 = bytes([48, 49] + [48] * 254)          # 0/1 bytes -> '0'/'1'
 _TBIN = bytes([0] * 48 + [0, 1] + [0] * 206)  # '0'/'1' -> 0/1
 _NB = ((1, 0, 1.0), (-1, 0, 1.0), (0, 1, 1.0), (0, -1, 1.0),
        (1, 1, 1.414), (1, -1, 1.414), (-1, 1, 1.414), (-1, -1, 1.414))
+_EC = 16.0  # exposure map cell (m)
+_PEN = 6.0   # exposure cost: an open cell costs up to 1+_PEN times a sheltered one
+_DETOUR = 1.35  # accept an exposure-aware route only if it is at most this much longer
 _CS = 16.0  # spatial hash cell for prisms
 
 
@@ -116,7 +119,9 @@ class Nav:
         self._path = None
         self._pi = 0
         self._pgoal = None
+        self.calm = False      # set by the policy: no enemy known near -> prefer low-exposure routes
         self._build(self._key_of(_mech_of(cfg)))
+        self._build_exposure()
 
     # ---------------------------------------------------------------- build
     @staticmethod
@@ -421,10 +426,53 @@ class Nav:
                 return best
         return None
 
+    # ---------------------------------------------------------------- exposure
+    def _build_exposure(self, budget=1.6):
+        """Coarse (_EC m) map of how open each spot is: fraction of 8 rays (eye 8 m, 150 m) with clear LOS.
+        Time-boxed; cells are visited in a scattered order so a cut-off still leaves an even coverage."""
+        t0 = time.perf_counter()
+        b = self.bounds
+        self.ex0, self.ey0 = b["minX"], b["minY"]
+        self.ecx = int((b["maxX"] - b["minX"]) / _EC) + 1
+        self.ecy = int((b["maxY"] - b["minY"]) / _EC) + 1
+        n = self.ecx * self.ecy
+        E = bytearray(b"\xff" * n)   # 255 = unknown
+        dirs = [(math.cos(k * math.pi / 4 + 0.2), math.sin(k * math.pi / 4 + 0.2)) for k in range(8)]
+        stride = 7919 if n % 7919 else 7907
+        for q in range(n):
+            if (q & 31) == 0 and time.perf_counter() - t0 > budget:
+                break
+            c = (q * stride) % n
+            x = self.ex0 + (c % self.ecx + 0.5) * _EC
+            y = self.ey0 + (c // self.ecx + 0.5) * _EC
+            if self.blocked(x, y):
+                continue
+            eye = (x, y, self.ground(x, y) + 8.0)
+            op = 0
+            for ux, uy in dirs:
+                fx, fy = x + ux * 150.0, y + uy * 150.0
+                if not (b["minX"] <= fx <= b["maxX"] and b["minY"] <= fy <= b["maxY"]) or self.los(eye, (fx, fy)):
+                    op += 1
+            E[c] = op * 255 // 8 if op * 255 // 8 < 255 else 254
+        self.expo = E
+        self.expo_ms = (time.perf_counter() - t0) * 1000.0
+
+    def exposure(self, x, y):
+        """0 (sheltered) .. 1 (open on every side); 0.5 where unknown."""
+        i = int((x - self.ex0) / _EC)
+        j = int((y - self.ey0) / _EC)
+        if i < 0 or j < 0 or i >= self.ecx or j >= self.ecy:
+            return 0.5
+        v = self.expo[j * self.ecx + i]
+        return 0.5 if v == 255 else v / 254.0
+
     # ---------------------------------------------------------------- A*
-    def _astar(self, s, g, budget=0.012):
+    def _astar(self, s, g, budget=0.012, pen=0.0):
         cnx, cny, chard, csoft, hard, nx = self.cnx, self.cny, self.chard, self.csoft, self.hard, self.nx
         dyn = self.dyn
+        expo, ecx = self.expo, self.ecx
+        ex0, ey0 = self.ex0, self.ey0
+        cs2 = 2 * self.step
         G, ST, CL, PA = self._G, self._ST, self._CL, self._PA
         self._cur += 1
         cur = self._cur
@@ -435,7 +483,8 @@ class Nav:
         G[s] = 0.0
         ST[s] = cur
         PA[s] = -1
-        heap = [(hs * 1.5, s)]
+        hw = 1.5 + 0.3 * pen   # inflated costs need a greedier heuristic to stay fast
+        heap = [(hs * hw, s)]
         best, bh = s, hs
         t0 = time.perf_counter()
         cnt = 0
@@ -468,7 +517,11 @@ class Nav:
                         continue
                 elif hard[(2 * j + dj) * nx + 2 * i + di]:
                     continue
-                ng = gn + c * (1 + csoft[m])
+                if pen:
+                    ev = expo[int((self.miny + nj * cs2 - ey0) / _EC) * ecx + int((self.minx + ni * cs2 - ex0) / _EC)]
+                    ng = gn + c * (1 + csoft[m] + (0.5 if ev == 255 else ev / 254.0) * pen)
+                else:
+                    ng = gn + c * (1 + csoft[m])
                 if ST[m] != cur or ng < G[m]:
                     ST[m] = cur
                     G[m] = ng
@@ -478,7 +531,7 @@ class Nav:
                     if h < bh:
                         bh = h
                         best = m
-                    heapq.heappush(heap, (ng + h * 1.5, m))
+                    heapq.heappush(heap, (ng + h * hw, m))
         out = []
         n = best
         while n != -1:
@@ -492,7 +545,11 @@ class Nav:
         g = self._near_walk(self._cell(goal_xy[0], goal_xy[1]))
         if s is None or g is None or self.comp[s] != self.comp[g]:
             return None
-        cells, _ = self._astar(s, g)
+        cells, reached = self._astar(s, g)
+        if self.calm and reached and len(cells) > 40:
+            c2, r2 = self._astar(s, g, budget=0.006, pen=_PEN)
+            if r2 and len(c2) <= _DETOUR * len(cells) + 2:
+                cells = c2
         pts = [self._xy(c) for c in cells[1:]]
         pts.append((goal_xy[0], goal_xy[1]))
         return pts
@@ -517,7 +574,7 @@ class Nav:
             return [0.0, 0.0], False, False
         self._steered = track  # strafing/flee headings are not goal travel: never count as stuck
         hx, hy = dx / d, dy / d
-        if d <= 80.0 and self._line_free(x, y, gx, gy):
+        if d <= (25.0 if self.calm else 80.0) and self._line_free(x, y, gx, gy):
             h = (hx, hy)
         else:
             h = self._follow(x, y, gx, gy, d, hx, hy)
@@ -547,7 +604,7 @@ class Nav:
                 return self._avoid(x, y, hx, hy)
         pi = self._pi
         best = min(pi + 1, len(P) - 1)
-        for k in range(min(len(P), pi + 15) - 1, pi, -1):
+        for k in range(min(len(P), pi + (5 if self.calm else 15)) - 1, pi, -1):
             if self._line_free(x, y, P[k][0], P[k][1]):
                 best = k
                 break
