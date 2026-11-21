@@ -252,9 +252,9 @@ class Policy:
         n, c = self._enemy_fractions(t)
         f = {k: (c[k] / n if n else 0.0) for k in c}
         if kind == "laser":
-            return 3.0 + 1.5 * f["mortar"] - 2.0 * f["lightning"]
+            return 3.6 + 1.5 * f["mortar"] - 2.0 * f["lightning"]
         if kind == "lightning":
-            return 2.6 + 1.5 * f["laser"] - 1.0 * f["mortar"]
+            return 3.0 + 1.5 * f["laser"] - 1.0 * f["mortar"]
         if kind == "mortar":
             v = 2.0 + 1.5 * f["lightning"] - 3.0 * f["laser"]
             if c["laser"] > 0:
@@ -407,7 +407,7 @@ class Policy:
         farm_target = None
         if farm_ok:
             for n in npcs:
-                if n["_d"] < 130:
+                if n["_d"] < 170:
                     farm_target = n
                     break
             if farm_target is None:
@@ -456,7 +456,7 @@ class Policy:
                     continue
                 dxy = hyp(pp[0] - pos[0], pp[1] - pos[1])
                 dz = abs(pp[2] - pos[2])
-                if dz > 6 or dxy > 150 or not zone_ok(pp, 4.0):
+                if dz > 6 or dxy > 220 or not zone_ok(pp, 4.0):
                     continue
                 k = p["kind"]
                 v = self._weapon_value(k, t)
@@ -471,9 +471,9 @@ class Policy:
                         continue
                     drop_slot = worst[1]
                     v -= worst[0]
-                elif v < 1.8:
+                elif v < 0.8:
                     continue
-                v = v - dxy * 0.02
+                v = v - dxy * 0.012
                 if v > best_pv:
                     best_pv, best_pick = v, (p, pp, dxy, dz, drop_slot)
         if best_pick and not hostile_near and not (flee or zone_urgent and best_pick[2] > 25):
@@ -551,7 +551,7 @@ class Policy:
                         if not cp:
                             continue
                         dd = hyp(cp[0] - pos[0], cp[1] - pos[1])
-                        if dd < 110 and abs(cp[2] - pos[2]) < 7 and zone_ok(cp, 4.0) and dd < best:
+                        if dd < 140 and abs(cp[2] - pos[2]) < 7 and zone_ok(cp, 4.0) and dd < best:
                             best, cube = dd, cp
                 if cube is not None:
                     mode = "cube"
@@ -658,9 +658,9 @@ class Policy:
             r = _num(d.get("radius"), 8.0)
             lands = _num(d.get("lands_in"), 0.0)
             dist = hyp(dp[0] - pos[0], dp[1] - pos[1])
-            if dist > 220 or not zone_ok(dp, 5.0):
+            if dist > 320 or not zone_ok(dp, 5.0):
                 continue
-            if (max(dist - r, 0) / max(walk, 1.0)) > lands + 14:
+            if (max(dist - r, 0) / max(walk, 1.0)) > lands + 25:
                 continue
             contested = [e for e in enemies if hyp(e["pos"][0] - dp[0], e["pos"][1] - dp[1]) < r + 20]
             if len(contested) >= 2 and hpf < 0.7:
