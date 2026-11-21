@@ -4,6 +4,7 @@ import (
 	"math"
 	"math/rand"
 	"sort"
+	"strings"
 )
 
 const lat = 0.075
@@ -463,6 +464,31 @@ var upgradeOrderSpeed = []string{
 	"mortar_reload", "mortar_splash", "mortar_velocity", "sensors", "laser_pierce",
 }
 
+// survivalGain scores an offered upgrade by its live effect in hello.config.upgrades:
+// damage-taken reductions and max-HP gains. Zero means "not a survival upgrade".
+func survivalGain(ups []Upgrade, id string) float64 {
+	g := 0.0
+	for _, u := range ups {
+		if u.ID != id {
+			continue
+		}
+		for _, e := range u.Effects {
+			p := strings.ToLower(e.Path)
+			switch {
+			case strings.Contains(p, "armor") || strings.Contains(p, "damage_taken") || strings.Contains(p, "dmg_taken"):
+				if e.Mul != nil && *e.Mul > 0 && *e.Mul < 1 {
+					g += 1 / *e.Mul - 1
+				}
+			case strings.Contains(p, "max_hp") || strings.HasSuffix(p, "hp"):
+				if e.Mul != nil && *e.Mul > 1 {
+					g += *e.Mul - 1
+				}
+			}
+		}
+	}
+	return g
+}
+
 func pickUpgrade(of *Offer, laserUp, nanoUp, speedUp bool) int {
 	order := upgradeOrder
 	if laserUp {
@@ -504,6 +530,12 @@ func (b *Brain) step(o *Obs, act *Action) {
 
 	if o.Offer != nil && len(o.Offer.Choices) > 0 {
 		p := pickUpgrade(o.Offer, b.P.LaserUp, b.P.NanoUp, b.P.SpeedUp)
+		bg := 0.0
+		for i, c := range o.Offer.Choices {
+			if g := survivalGain(b.Cfg.Upgrades, c.ID); g > bg*1.05 && g > 0 {
+				bg, p = g, i
+			}
+		}
 		act.Pick = &p
 	}
 
