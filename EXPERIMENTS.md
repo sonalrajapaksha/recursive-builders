@@ -27,3 +27,5 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E23 | laser-cover 430547c (combo2 + cover/committed-sidestep laser defence); docker amd64 checks PASS for laser-cover(p99 10.0), abl-shootback(5.2), abl-quiet(3.6), abl-reload(4.0) | queue ready |
 | E24 | official laser-cover (430547c) | 4.44 vs combo2 4.54: no gain. Laser defence alone is not the lever (or sim of beam-line trigger too wide). Next: abl-shootback. |
 | E25 | plan | Structural round: A 'lightning-rush' (weapon doctrine: close to <=45m, lightning beats laser, DPS math), B 'cover-routes' (exposure-weighted nav using static map). Ablations (abl-shootback running; abl-quiet, abl-reload, diag-bots queued) continue in parallel. |
+| E26 | official abl-shootback (b5bcf62) | 4.31 vs combo2 4.54: -0.23. Shoot-back-while-fleeing likely the cause of combo3's drop; DROP it. |
+| E27 | lightning-rush 3f03885 docker check PASS p99 2.0ms | submitted as #12 |
