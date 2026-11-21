@@ -291,6 +291,27 @@ def test_laser_lead_is_short():
     assert 0.0 < a["aim"][0] < 0.03, a["aim"]
 
 
+def test_mortar_high_arc_when_blocked():
+    lo = mortar_pitch(150, 0, 72, 22)
+    hi = mortar_pitch(150, 0, 72, 22, True)
+    assert lo < 0.5 < hi < 1.3
+    assert mortar_pitch(60, 0, 72, 22, True) > 1.3   # too steep: policy must skip, not fire low into the wall
+
+    class Blocked(StubNav):
+        def los(self, a, b):
+            return False
+    o = base_obs()
+    o["self"]["weapons"][1] = {"kind": "mortar", "cooldown": 0, "stats": HELLO["config"]["weapons"]["mortar"]}
+    o["mechs"] = [enemy(5, 60, 0)]
+    a = Policy(HELLO, Blocked()).act(o)
+    assert not a["fire"][1], a
+    o["mechs"] = [enemy(5, 150, 0)]
+    o["events"] = [{"type": "damaged", "amount": 45, "weapon": "gun", "bearing": 0.0, "by": 5}]
+    o["self"]["aim"] = [0.0, 0.5]
+    a = Policy(HELLO, Blocked()).act(o)
+    assert a["aim"][1] > 0.5, a
+
+
 if __name__ == "__main__":
     fails = 0
     for name, fn in sorted(globals().items()):

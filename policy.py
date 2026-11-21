@@ -58,14 +58,14 @@ def lead_point(src, tpos, tvel, speed, iters=3):
     return p, t
 
 
-def mortar_pitch(dh, dz, v, g):
-    """Low-arc launch pitch to hit horizontal distance dh, height offset dz; None if out of range."""
+def mortar_pitch(dh, dz, v, g, high=False):
+    """Launch pitch to hit horizontal distance dh, height offset dz (low arc, or high arc to lob over walls); None if out of range."""
     if dh < 1e-3:
         return None
     disc = v ** 4 - g * (g * dh * dh + 2 * dz * v * v)
     if disc < 0:
         return None
-    return math.atan2(v * v - math.sqrt(disc), g * dh)
+    return math.atan2(v * v + (1 if high else -1) * math.sqrt(disc), g * dh)
 
 
 def zone_now(z, t):
@@ -810,8 +810,9 @@ class Policy:
             for _ in range(4):
                 px, py, pz = tp[0] + tv[0] * tt, tp[1] + tv[1] * tt, tp[2] + 1.0
                 dh = hyp(px - pos[0], py - pos[1]) - 3.0
-                pitch = mortar_pitch(dh, pz - tube_z, v, g)
-                if pitch is None:
+                pitch = mortar_pitch(dh, pz - tube_z, v, g, not los)   # blocked LOS: lob high, a low arc hits the wall beside us
+                if pitch is None or pitch > _num(self.mech.get("max_pitch"), 1.3):
+                    pitch = None
                     break
                 tt = dh / max(v * math.cos(pitch), 1e-6)
             if pitch is None:
