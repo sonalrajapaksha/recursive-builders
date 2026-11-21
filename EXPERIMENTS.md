@@ -11,3 +11,4 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E7 | official aggressor (74bbadc): boost-loot, engage more, damage upgrades | 3.88 vs v1 3.56. Direction confirmed: capability beats passivity. |
 | E8 | official audit-aggressor (d315858): bug fixes + aggressor + mortar arc fix | 4.25 (best). Bug fixes added +0.37 over aggressor 3.88. |
 | E9 | eval-sim (Terra, 55ed33c) squad approximation | calibration FAILED (sim v1 0.0 vs real 3.56). Do not use for selection; official scores are the only signal. |
+| E10 | official aggressor2 (a6eb860): faster/wider loot, cubes, drops | 4.31 vs 4.25 (within noise, still best). Gap to top-20 (~5.1): ~0.8 |

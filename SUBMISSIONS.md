@@ -6,4 +6,4 @@
 | 3 | 74bbadc8e73314a1e0ef4528d5f0c5e697b83bb5 (branch aggressor) | 2026-11-21 21:55 NZDT | scored (BB-673700B0) | 3.88 (BEST so far) |
 Note: site allows only ONE submission in scoring at a time; wait for the current to finish. audit-fixes (6802a4b) validated, pushed, queued next.
 | 4 | d315858d917166e69cb923a667caf92866447f5e (branch audit-aggressor = audit-fixes + aggressor + mortar arc fix) | 2026-11-21 21:58 NZDT | scored (BB-0EFB25CD) | 4.25 (BEST) |
-| 5 | a6eb860b088be91711f0789a8d603ab767d24b90 (branch aggressor2 = audit-aggressor + faster/wider loot, cubes, drops) | 2026-11-21 22:00 NZDT | received, receipt BB-FF691224, scoring | pending |
+| 5 | a6eb860b088be91711f0789a8d603ab767d24b90 (branch aggressor2 = audit-aggressor + faster/wider loot, cubes, drops) | 2026-11-21 22:00 NZDT | scored (BB-FF691224) | 4.31 (BEST) |
