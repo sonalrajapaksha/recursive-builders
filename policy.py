@@ -105,6 +105,7 @@ class Policy:
         self.near_r = _num(_g(cfg, "vision", "near_range"), 45.0)
         self.slot = _g(hello, "slot", default=-1)
         self.mem = {}          # enemy id -> dict(pos, vel, hp, weapons, t)
+        self._lz_key, self._lz_until, self._lz_cover, self._lz_side = None, -1.0, None, 1.0
         self.bad = {}          # pickup id -> expiry t
         self.prov_until = -1.0
         self.threat_bearing = None
@@ -703,6 +704,34 @@ class Policy:
             return None
         return (best[1], best[2], best[3])
 
+    def _laser_cover(self, pos, muz, stats):
+        """Nearest point within 12 m reachable in ~0.6 s that breaks LOS from the laser muzzle; "hold" if already hidden."""
+        if not (self.nav_ok and self.nav is not None):
+            return None
+
+        def hidden(x, y):
+            return not (self._los(muz, [x, y, pos[2] + 1.0]) or self._los(muz, [x, y, pos[2] + 8.0]))
+        if hidden(pos[0], pos[1]):
+            return "hold"
+        spd = _num(stats.get("boost_speed"), 19.5)
+        best, bd = None, 1e9
+        for r in (3.0, 6.0, 9.0, 12.0):
+            if r / spd > 0.6:
+                break
+            for k in range(16):
+                a = k * math.pi / 8
+                x, y = pos[0] + math.cos(a) * r, pos[1] + math.sin(a) * r
+                try:
+                    if self.nav.blocked(x, y) or not hidden(x, y):
+                        continue
+                except Exception:
+                    return None
+                if r < bd:
+                    bd, best = r, (x, y)
+            if best:
+                break
+        return best
+
     def _dodge(self, obs, pos, vel, t, enemies, stats):
         """Return (dir, weight 0..1, jump)."""
         cx, cy, cz = pos[0], pos[1], pos[2] + 4.5
@@ -766,14 +795,29 @@ class Policy:
                 continue
             bearing = math.atan2(cy - ep[1], cx - ep[0])
             err = abs(wrap(bearing - ea[0]))
-            if err < math.atan2(rad + 2.0, d) + 0.12:
-                ux, uy = math.cos(ea[0]), math.sin(ea[0])
-                side = (cx - ep[0]) * -uy + (cy - ep[1]) * ux
-                sgn = 1.0 if side >= 0 else -1.0
-                dx += -uy * sgn
-                dy += ux * sgn
-                w = max(w, 0.9)
-                jump = True
+            if err < 0.25:
+                key = e.get("id")
+                if self._lz_key != key or t > self._lz_until:
+                    # new charge: pick once (cover point or a side) and commit for the whole charge + hold
+                    self._lz_key, self._lz_until, self._lz_cover = key, t + 2.8, None
+                    muz = [ep[0], ep[1], ep[2] + 7.0]
+                    self._lz_cover = self._laser_cover(pos, muz, stats)
+                    ux, uy = math.cos(ea[0]), math.sin(ea[0])
+                    side = (cx - ep[0]) * -uy + (cy - ep[1]) * ux
+                    self._lz_side = 1.0 if side >= 0 else -1.0
+                cv = self._lz_cover
+                if cv == "hold":
+                    dx, dy, w = 0.0, 0.0, 1.0
+                    break
+                if cv is not None:
+                    dx += cv[0] - pos[0]
+                    dy += cv[1] - pos[1]
+                else:
+                    ux, uy = math.cos(ea[0]), math.sin(ea[0])
+                    dx += -uy * self._lz_side
+                    dy += ux * self._lz_side
+                w = 1.0
+                jump = cv is None
         if w > 0:
             dx, dy = unit(dx, dy)
         return (dx, dy), w, jump

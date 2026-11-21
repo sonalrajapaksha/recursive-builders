@@ -335,6 +335,45 @@ def test_no_laser_charge_into_lightning_holder():
     assert a["fire"][1], a
 
 
+def _charging_obs():
+    o = base_obs()
+    o["self"]["pos"] = [0.0, 0.0, 0.0]
+    o["mechs"] = [enemy(5, 140, 0, charging=True, aim=(math.pi, 0))]   # beam along -x straight at us
+    return o
+
+
+def test_laser_sidestep_commits_one_side():
+    p = Policy(HELLO, StubNav())
+    o = _charging_obs()
+    a1 = p.act(o)
+    assert abs(a1["move"][1]) > 0.9 and abs(a1["move"][0]) < 0.2, a1   # perpendicular to the beam
+    side = a1["move"][1] > 0
+    for k in range(1, 6):   # we moved a bit across the line: must not flip sides while the charge lasts
+        o2 = copy.deepcopy(o)
+        o2["tick"] += 2 * k
+        o2["t"] += 0.1 * k
+        o2["self"]["pos"] = [0.0, (3.0 if side else -3.0) * k, 0.0]
+        a = p.act(o2)
+        assert (a["move"][1] > 0) == side, (k, a)
+
+
+def test_laser_takes_cover_when_available():
+    class Cover(StubNav):
+        # a pillar blocks the beam for any point with y > 4 (shooter at +x, y=0)
+        def los(self, a, b):
+            return not (b[1] > 4 and abs(b[0]) < 30)
+
+        def blocked(self, x, y, z=None):
+            return False
+    p = Policy(HELLO, Cover())
+    a = p.act(_charging_obs())
+    assert a["move"][1] > 0.5, a          # heads to the covered side
+    o = _charging_obs()
+    o["self"]["pos"] = [0.0, 6.0, 0.0]
+    a = Policy(HELLO, Cover()).act(o)
+    assert a["move"] == [0.0, 0.0], a      # already hidden: hold
+
+
 if __name__ == "__main__":
     fails = 0
     for name, fn in sorted(globals().items()):
