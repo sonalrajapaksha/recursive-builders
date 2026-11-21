@@ -18,3 +18,4 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 14 | 3734583f2d8082be2379722c0743aab9aecd3e08 (abl-reload) | single-change ablation of combo2 | received, receipt BB-07B91792, scoring | pending |
 | 14 result | abl-reload 3734583 | 4.50 (receipt BB-D7B91790, took ~30 min stuck in Fetching) | neutral vs combo2 ~4.58 |
 | 15 | 74472114cef8bea5ee11a6ed37f924b46cd13127 (giddy-base: MIT Go bot justnau/giddygiddyboy-mech-royale@edbdb6b, unchanged, license kept) | user chose it as new strategy base; docker amd64 check PASS p99 5.8ms | scored, receipt BB-31B21D8B | 6.10 (now final entry) |
+| 16 | 53e6cd3867d2819ef88d388d906d7366b6eaccc2 (gx-kill-zonecenter, giddy-base + late-game zone-center bias) | docker PASS | received (receipt BB-9A6AABA8-ish), scoring | pending |
