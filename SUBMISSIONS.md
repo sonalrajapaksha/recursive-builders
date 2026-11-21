@@ -36,3 +36,4 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 29 | 84241ddf547867af7ebdd7f2263c1019e356470a (wpn-mortar) | docker PASS | scored, receipt BB-22D61D99 | 5.83 (-0.27 vs base; dropped) |
 | 30 | 3246db203f89c2fd8c58cda1a288a410737f31ab (gx-cube-upgrade: armor/HP upgrade pick by offer effects) | docker PASS | scored, receipt BB-C83FF009 | 6.10 (no effect) |
 | 31 | 0984e87ad2b0c297fbac8e9500ef212b6af1b302 (gx-cube-drops: UseDrops true) | docker PASS | scored, receipt BB-CD1778F5 | **6.21 (+0.11 vs base 6.10): NEW BEST, shown as final pick** |
+| 32 | f2e0c1395f5b1eadd3f7e37caa88b27e75ec731a (tv-dv400: dtune-base 4a16f10 + DropV1 300/DropV2 400) | docker PASS | received, scoring | pending |
