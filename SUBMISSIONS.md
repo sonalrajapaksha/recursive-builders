@@ -10,4 +10,4 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 6 | 24f35d6752b20776e91f1dce0a2b51cfa7babaab (branch combo1 = aggressor2 + fight-quality) | 2026-11-21 22:53 NZDT | scored (BB-74B78296) | 4.25 (noise vs 4.31) |
 | 7 | 5a8d567f2ca46e03c3bf1af190926bdb7687c059 (branch duelist = combo1 + peek-and-heal) | 2026-11-21 22:56 NZDT | scored (BB-BE687122) | 4.10 (worse than combo1 4.25) |
 | 8 | bff00824a32cc2c4f275281839cc2d9e0a0874f5 (branch combo2 = combo1 + aggressor3 + gearup) | 2026-11-21 22:58 NZDT | scored (BB-E97BDD84) | 4.54 (BEST) |
-| 9 | 627c6156e83a5b47879e01ff037381b3500a51ac (branch combo3 = combo2 + laser sidestep commit + shoot-back while fleeing + reload fix + quiet hide) | 2026-11-21 23:02 NZDT | received, receipt BB-2A8D6D84, scoring | pending |
+| 9 | 627c6156e83a5b47879e01ff037381b3500a51ac (branch combo3 = combo2 + laser sidestep commit + shoot-back while fleeing + reload fix + quiet hide) | 2026-11-21 23:02 NZDT | scored (BB-2A8D6D84) | 4.27 (worse than combo2 4.54; score provided by user) |
