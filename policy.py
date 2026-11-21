@@ -394,6 +394,7 @@ class Policy:
         n_close = len([e for e in vis if e["_d"] < 100])
         e0 = vis[0] if vis else None
         provoked = t < self.prov_until
+        known_near = bool(vis) or any(t - m["t"] < 10 and hyp(m["pos"][0] - pos[0], m["pos"][1] - pos[1]) < 160 for m in self.mem.values())
         flee = False
         if e0:
             ehp = _num(e0.get("hp"), mhp)
@@ -453,7 +454,7 @@ class Policy:
         if gun:
             gs = gun[1]
             mag = _num(_g(gs, "stats", "mag"), _num(_g(self.W, "gun", "mag"), 12))
-            if _num(gs.get("reload"), 0) <= 0 and (_num(gs.get("ammo"), mag) <= 0 or (target is None and _num(gs.get("ammo"), mag) < mag * 0.6)):
+            if _num(gs.get("reload"), 0) <= 0 and (_num(gs.get("ammo"), mag) <= 0 or (target is None and e0 is None and _num(gs.get("ammo"), mag) < mag * 0.6)):
                 reload_now = True
         if target is not None:
             aim, fire = self._aim_fire(target, ttype, pos, mz, eye_h, aim_now, wk, energy, t)
@@ -463,6 +464,13 @@ class Policy:
             aim = [self.threat_bearing, 0.0]   # face the attacker: rear armor x1.5
         elif newest is not None and newest[1] >= 0.5:
             aim = [newest[0], 0.0]
+        if target is None and e0 is not None and gun and not reload_now:
+            # fleeing/hiding: torso aims independently of legs - keep the gun on a visible enemy (also keeps rear armor off)
+            gr = _num(_g(gun[1], "stats", "range"), 230.0)
+            tpos = _vec(e0["pos"])
+            if e0["_d"] < gr * 0.95 and self._los((pos[0], pos[1], pos[2] + eye_h), (tpos[0], tpos[1], tpos[2] + 4.5)):
+                aim, f2 = self._aim_fire(e0, "mech", pos, mz, eye_h, aim_now, {"gun": gun}, energy, t)
+                fire[gun[0]] = f2[gun[0]]
         if reload_now:
             act["reload"] = True
 
@@ -589,7 +597,7 @@ class Policy:
                     da = hyp(anchor[0] - pos[0], anchor[1] - pos[1])
                     if da > 12:
                         goal = (anchor[0], anchor[1])
-                        boost_pref = da > 90
+                        boost_pref = known_near and da > 90
                     else:
                         goal = None
                         ax, ay = self.danger
@@ -608,7 +616,7 @@ class Policy:
         if goal is not None:
             mv, jump, steer_boost = self._steer(pos, goal, vel, tick)
             d_goal = hyp(goal[0] - pos[0], goal[1] - pos[1])
-            if d_goal > 60 and energy > 35 and mode in ("zone", "hide", "drop", "loot", "cube"):
+            if d_goal > 60 and energy > 35 and (mode in ("zone", "drop", "loot", "cube") or (mode == "hide" and known_near)):
                 boost_pref = True
             if d_goal < 6:
                 s = d_goal / 6.0
@@ -769,7 +777,7 @@ class Policy:
                 continue
             bearing = math.atan2(cy - ep[1], cx - ep[0])
             err = abs(wrap(bearing - ea[0]))
-            if err < math.atan2(rad + 2.0, d) + 0.12:
+            if err < math.atan2(rad + 2.0, d) + 0.2:
                 ux, uy = math.cos(ea[0]), math.sin(ea[0])
                 side = (cx - ep[0]) * -uy + (cy - ep[1]) * ux
                 # commit to one side for the whole charge: the shooter's aim tracks us, so re-picking the
@@ -777,7 +785,7 @@ class Policy:
                 sgn = self.laser_side.setdefault(e.get("id"), 1.0 if side >= 0 else -1.0)
                 dx += -uy * sgn
                 dy += ux * sgn
-                w = max(w, 0.9)
+                w = 1.0   # step off the beam line at full speed, on the committed side
                 jump = True
         if w > 0:
             dx, dy = unit(dx, dy)

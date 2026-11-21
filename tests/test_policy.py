@@ -335,6 +335,31 @@ def test_no_laser_charge_into_lightning_holder():
     assert a["fire"][1], a
 
 
+def test_no_early_reload_with_enemy_visible():
+    o = base_obs()
+    o["self"]["weapons"] = [{"kind": "gun", "cooldown": 0, "ammo": 4, "reload": 0, "stats": HELLO["config"]["weapons"]["gun"]}, None]
+    assert Policy(HELLO, StubNav()).act(o).get("reload")
+    o["mechs"] = [enemy(5, 150, 0)]
+    assert not Policy(HELLO, StubNav()).act(o).get("reload")
+
+
+def test_shoots_back_while_fleeing():
+    o = base_obs()
+    o["self"]["weapons"] = [{"kind": "gun", "cooldown": 0, "ammo": 12, "reload": 0, "stats": HELLO["config"]["weapons"]["gun"]}, None]
+    o["self"]["aim"] = [0.0, -0.04]
+    o["mechs"] = [enemy(i, 60 + i, 10 * i) for i in range(3)]   # 3 close: flee
+    a = Policy(HELLO, StubNav()).act(o)
+    assert a["move"][0] < 0 and abs(a["aim"][0]) < 0.3 and a["fire"][0], a
+
+
+def test_hide_does_not_boost_when_quiet():
+    o = base_obs()
+    o["self"]["pos"] = [300.0, 0.0, 0.0]
+    o["self"]["energy"] = 100
+    a = Policy(HELLO, StubNav()).act(o)
+    assert not a["boost"], a
+
+
 if __name__ == "__main__":
     fails = 0
     for name, fn in sorted(globals().items()):
