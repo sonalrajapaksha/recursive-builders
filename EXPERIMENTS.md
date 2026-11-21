@@ -13,3 +13,4 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E9 | eval-sim (Terra, 55ed33c) squad approximation | calibration FAILED (sim v1 0.0 vs real 3.56). Do not use for selection; official scores are the only signal. |
 | E10 | official aggressor2 (a6eb860): faster/wider loot, cubes, drops | 4.31 vs 4.25 (within noise, still best). Gap to top-20 (~5.1): ~0.8 |
 | E11 | combo1 (24f35d6) = aggressor2 + fight-quality; docker amd64 check PASS p99 5.5ms | submit when quota frees (next slot 4:51 AM EST) |
+| E12 | aggressor3 (62e1234) = aggressor2 + early zone exit in late phases + chase weak mechs; docker check PASS | queued after combo1 |
