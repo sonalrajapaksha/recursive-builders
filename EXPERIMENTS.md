@@ -25,3 +25,4 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E21 | diag-bots 108a18b (combo2 + sidestep-commit only) docker check PASS p99 6.0ms | submit at next slot (5:53 AM EST) as ablation |
 | E22 | ablation branches from combo2: abl-reload 3734583, abl-shootback b5bcf62, abl-quiet 520c57f (single change each) | pushed; submit one per slot after diag-bots(108a18b, sidestep-only) |
 | E23 | laser-cover 430547c (combo2 + cover/committed-sidestep laser defence); docker amd64 checks PASS for laser-cover(p99 10.0), abl-shootback(5.2), abl-quiet(3.6), abl-reload(4.0) | queue ready |
+| E24 | official laser-cover (430547c) | 4.44 vs combo2 4.54: no gain. Laser defence alone is not the lever (or sim of beam-line trigger too wide). Next: abl-shootback. |
