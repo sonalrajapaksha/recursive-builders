@@ -1974,7 +1974,7 @@ func squadParams(p Params) Params {
 	p.HPw = 0.18
 	p.LethalK = 0.75
 
-	return p
+	return applyTune(p)
 }
 
 func (b *Brain) cubeCap() int {
