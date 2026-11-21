@@ -33,4 +33,5 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 26 | da818512377cca91eeb59f4966f01dae79d091ec (mpc-combat-lite: MPC only on laser/bullet triggers) | docker PASS | scored, receipt BB-6742FA62 | 5.35 (-0.75 vs base; dropped) |
 | 27 | cbc30a1fb24587ee19ba0854d71a7d69b3265d7d (wpn-ambush: hidden pre-charged laser ambush) | docker PASS | scored, receipt BB-02808AD2 | 5.85 (-0.25 vs base; dropped) |
 | 28 | f1999a24f30ecc0977419c61490c706412d4284a (wpn-lightning-counter) | docker PASS | scored, receipt BB-4F4F41BA | 6.10 (trigger never fires in practice; no effect) |
-| 29 | 84241ddf547867af7ebdd7f2263c1019e356470a (wpn-mortar) | docker PASS | received, scoring | pending |
+| 29 | 84241ddf547867af7ebdd7f2263c1019e356470a (wpn-mortar) | docker PASS | scored, receipt BB-22D61D99 | 5.83 (-0.27 vs base; dropped) |
+| 30 | 3246db203f89c2fd8c58cda1a288a410737f31ab (gx-cube-upgrade: armor/HP upgrade pick by offer effects) | docker PASS | received, scoring | pending |
