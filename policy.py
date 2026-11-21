@@ -393,6 +393,7 @@ class Policy:
         n_close = len([e for e in vis if e["_d"] < 100])
         e0 = vis[0] if vis else None
         provoked = t < self.prov_until
+        known_near = bool(vis) or any(t - m["t"] < 10 and hyp(m["pos"][0] - pos[0], m["pos"][1] - pos[1]) < 160 for m in self.mem.values())
         flee = False
         if e0:
             ehp = _num(e0.get("hp"), mhp)
@@ -588,7 +589,7 @@ class Policy:
                     da = hyp(anchor[0] - pos[0], anchor[1] - pos[1])
                     if da > 12:
                         goal = (anchor[0], anchor[1])
-                        boost_pref = da > 90
+                        boost_pref = known_near and da > 90
                     else:
                         goal = None
                         ax, ay = self.danger
@@ -607,7 +608,7 @@ class Policy:
         if goal is not None:
             mv, jump, steer_boost = self._steer(pos, goal, vel, tick)
             d_goal = hyp(goal[0] - pos[0], goal[1] - pos[1])
-            if d_goal > 60 and energy > 35 and mode in ("zone", "hide", "drop", "loot", "cube"):
+            if d_goal > 60 and energy > 35 and (mode in ("zone", "drop", "loot", "cube") or (mode == "hide" and known_near)):
                 boost_pref = True
             if d_goal < 6:
                 s = d_goal / 6.0

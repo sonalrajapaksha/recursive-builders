@@ -335,6 +335,14 @@ def test_no_laser_charge_into_lightning_holder():
     assert a["fire"][1], a
 
 
+def test_hide_does_not_boost_when_quiet():
+    o = base_obs()
+    o["self"]["pos"] = [300.0, 0.0, 0.0]
+    o["self"]["energy"] = 100
+    a = Policy(HELLO, StubNav()).act(o)
+    assert not a["boost"], a
+
+
 if __name__ == "__main__":
     fails = 0
     for name, fn in sorted(globals().items()):
