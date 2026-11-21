@@ -118,6 +118,12 @@ class TestNav(unittest.TestCase):
                 break
         self.assertLess(math.dist(pos, b), 3.0)
 
+    def test_untracked_steer_never_stuck(self):
+        n = navmod.Nav(ARENA)
+        for k in range(1, 80):
+            n.steer((0.0, 0.0), (0.0, 40.0), CFG, None, False)
+            self.assertFalse(n.note_progress((0.0, 0.0), k * 2))
+
     def test_stuck_recovery(self):
         n = navmod.Nav(ARENA)
         pos = (0.0, 0.0)

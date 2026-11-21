@@ -507,7 +507,7 @@ class Nav:
                 return c, s
         return hx, hy
 
-    def steer(self, pos, goal_xy, cfg, vel=None):
+    def steer(self, pos, goal_xy, cfg, vel=None, track=True):
         self._ensure(cfg)
         x, y = pos[0], pos[1]
         gx, gy = goal_xy[0], goal_xy[1]
@@ -515,7 +515,7 @@ class Nav:
         d = math.hypot(dx, dy)
         if d < 1.0:
             return [0.0, 0.0], False, False
-        self._steered = True
+        self._steered = track  # strafing/flee headings are not goal travel: never count as stuck
         hx, hy = dx / d, dy / d
         if d <= 80.0 and self._line_free(x, y, gx, gy):
             h = (hx, hy)

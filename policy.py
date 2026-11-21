@@ -178,11 +178,11 @@ class Policy:
             a["pick"] = self._pick(obs["offer"], me)
         return a
 
-    def _steer(self, pos, goal, vel, tick):
+    def _steer(self, pos, goal, vel, tick, track=True):
         """Navigation with straight-line fallback. Returns (move, jump, boost_hint)."""
         if self.nav_ok and self.nav is not None:
             try:
-                res = self.nav.steer(pos, goal, self.cfg, vel)
+                res = self.nav.steer(pos, goal, self.cfg, vel, track)
                 mv = _vec(res[0], 2)
                 if mv is not None:
                     return mv, bool(res[1]), bool(res[2])
@@ -435,6 +435,8 @@ class Policy:
                 reload_now = True
         if target is not None:
             aim, fire = self._aim_fire(target, ttype, pos, mz, eye_h, aim_now, wk, energy, t)
+        elif e0 is not None:
+            aim = [math.atan2(e0["pos"][1] - pos[1], e0["pos"][0] - pos[0]), 0.0]   # face visible enemy (rear armor x1.5)
         elif self.threat_bearing is not None and t - self.threat_t < 2.5:
             aim = [self.threat_bearing, 0.0]   # face the attacker: rear armor x1.5
         elif newest is not None and newest[1] >= 0.5:
@@ -584,7 +586,7 @@ class Policy:
                 s = d_goal / 6.0
                 mv = [mv[0] * max(s, 0.25), mv[1] * max(s, 0.25)]
         elif move_dir is not None and hyp(*move_dir) > 0.05:
-            mv, jump, steer_boost = self._steer(pos, (pos[0] + move_dir[0] * 40, pos[1] + move_dir[1] * 40), vel, tick)
+            mv, jump, steer_boost = self._steer(pos, (pos[0] + move_dir[0] * 40, pos[1] + move_dir[1] * 40), vel, tick, False)
             k = min(1.0, hyp(*move_dir))
             mv = [mv[0] * k, mv[1] * k]
         else:
@@ -797,7 +799,7 @@ class Policy:
             if mode == "lightning":
                 aim = aim_at(tc)
         elif mode == "laser":
-            p = [tc[i] + tv[i] * 0.25 for i in range(3)]   # beam fires ~instantly after release; short lead
+            p = [tc[i] + tv[i] * 0.1 for i in range(3)]   # hitscan fires within ~1 decision of release
             aim = aim_at(p)
         elif mode == "mortar":
             v = _num(_g(mort[1], "stats", "speed"), _num(_g(self.W, "mortar", "speed"), 72.0))

@@ -20,7 +20,7 @@ def load_stream():
 
 
 class StubNav:
-    def steer(self, pos, goal, cfg, vel=None):
+    def steer(self, pos, goal, cfg, vel=None, track=True):
         dx, dy = goal[0] - pos[0], goal[1] - pos[1]
         d = math.hypot(dx, dy) or 1.0
         return [dx / d, dy / d], False, False
@@ -257,6 +257,38 @@ def test_nav_failure_fallback():
     p = Policy(HELLO, None)
     for o in OBS[:50]:
         valid(p.act(o), o["tick"])
+
+
+def test_faces_visible_enemy_while_not_targeting():
+    # enemy at 120 m (not engaged): we walk to the anchor but must keep facing it, not the walk direction
+    o = base_obs()
+    o["mechs"] = [enemy(5, 120, 0)]
+    a = Policy(HELLO, StubNav()).act(o)
+    assert not any(a["fire"]) and abs(a["aim"][0]) < 0.01, a
+
+
+def test_strafe_steer_not_tracked_as_travel():
+    calls = []
+
+    class N(StubNav):
+        def steer(self, pos, goal, cfg, vel=None, track=True):
+            calls.append(track)
+            return super().steer(pos, goal, cfg, vel)
+    o = base_obs()
+    o["mechs"] = [enemy(5, 50, 0)]
+    Policy(HELLO, N()).act(o)
+    assert calls and calls[0] is False, calls
+
+
+def test_laser_lead_is_short():
+    o = base_obs()
+    o["self"]["weapons"][1] = {"kind": "laser", "cooldown": 0, "charge": 0,
+                               "stats": HELLO["config"]["weapons"]["laser"]}
+    o["mechs"] = [enemy(5, 60, 0, vel=(0, 10, 0))]
+    o["self"]["aim"] = [0.0, 0.0]
+    a = Policy(HELLO, StubNav()).act(o)
+    # target moves 10 m/s: 0.1 s lead = 1 m => ~0.017 rad at 60 m (old 0.25 s lead = 0.042 rad)
+    assert 0.0 < a["aim"][0] < 0.03, a["aim"]
 
 
 if __name__ == "__main__":
