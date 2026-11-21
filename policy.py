@@ -123,6 +123,7 @@ class Policy:
         self.errs = 0
         self.mode = "init"
         self.nav_ok = nav is not None
+        self.seen = {}         # remembered loot: ('p'|'c', id) -> (item dict, t)
 
     # ------------------------------------------------------------------ public
     def act(self, obs):
@@ -215,6 +216,24 @@ class Policy:
         if d <= radius:
             return [frm[0], frm[1]]
         return [center[0] + vx / d * radius, center[1] + vy / d * radius]
+
+    def _remember(self, kind, items, pos, t):
+        """Visible loot plus loot seen earlier and now out of sight (dropped when we stand on the spot or after 90 s)."""
+        cur = {}
+        for it in items or []:
+            if isinstance(it, dict) and it.get("id") is not None:
+                cur[it["id"]] = it
+                self.seen[(kind, it["id"])] = (it, t)
+        out = list(cur.values())
+        for k, (it, ts) in list(self.seen.items()):
+            if k[0] != kind or k[1] in cur:
+                continue
+            ip = _vec(it.get("pos"))
+            if t - ts > 90 or not ip or hyp(ip[0] - pos[0], ip[1] - pos[1]) < 6:
+                del self.seen[k]
+            else:
+                out.append(it)
+        return out
 
     # ------------------------------------------------------------------ offers / loot values
     def _pick(self, offer, me):
@@ -450,7 +469,8 @@ class Policy:
         take_pickup = None
         goal = None
         mode = "hide"
-        pickups = obs.get("pickups") or []
+        pickups = self._remember("p", obs.get("pickups"), pos, t)
+        cubes_all = self._remember("c", obs.get("cubes"), pos, t)
         hostile_near = bool(e0 and e0["_d"] < 40)
         best_pick, best_pv = None, 0.0
         if not zone_urgent or True:
@@ -533,7 +553,7 @@ class Policy:
             move_dir = unit(ux * rad + px * tang * self.strafe, uy * rad + py * tang * self.strafe)
             if hostile_near or d < 25:
                 boost_pref = False
-            elif ttype != "mech" and d > pref + 30:
+            elif ttype != "mech" and d > max(pref + 30, 60):
                 boost_pref = True
             elif ttype == "mech" and d > pref + 30 and energy > 40 and (
                     _num(target.get("hp"), mhp) < 0.4 * _num(target.get("max_hp"), mhp) and hpf > 0.5):
@@ -553,7 +573,7 @@ class Policy:
                 cube = None
                 if safe_to_wander or (vis and e0["_d"] > 70 and hpf > 0.5):
                     best = 1e9
-                    for c in obs.get("cubes") or []:
+                    for c in cubes_all:
                         cp = _vec(c.get("pos"))
                         if not cp:
                             continue
@@ -587,7 +607,7 @@ class Policy:
         if goal is not None:
             mv, jump, steer_boost = self._steer(pos, goal, vel, tick)
             d_goal = hyp(goal[0] - pos[0], goal[1] - pos[1])
-            if d_goal > 30 and energy > 35 and mode in ("zone", "hide", "drop", "loot", "cube"):
+            if d_goal > 60 and energy > 35 and mode in ("zone", "hide", "drop", "loot", "cube"):
                 boost_pref = True
             if d_goal < 6:
                 s = d_goal / 6.0
