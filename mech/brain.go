@@ -96,6 +96,7 @@ type Brain struct {
 	otherDead          int
 	stickID            int
 	stickAt, loseAt    float64
+	regenOn            bool
 }
 
 type Params struct {
@@ -798,6 +799,12 @@ func (b *Brain) step(o *Obs, act *Action) {
 	case zoneShould && zdist > 2:
 		mx, my = b.travel(me, zgx, zgy)
 		mode = "zone"
+	case b.regenHold(hpFrac, danger, now):
+		// Squad mode never retreats without a threat; stand still unseen so the 5 s regen timer can run.
+		if b.coverMove(o, seen, &mx, &my) {
+			boost = false
+		}
+		mode = "regen"
 	default:
 		lc := b.chooseLoot(o, hpFrac, danger)
 		if lc != nil {
@@ -1129,6 +1136,19 @@ func (b *Brain) step(o *Obs, act *Action) {
 	act.Move = [2]float64{mx, my}
 	act.Boost = boost && (mx != 0 || my != 0)
 	b.Mode = mode
+}
+
+func (b *Brain) regenHold(hpFrac float64, danger bool, now float64) bool {
+	if !b.P.LoseRule || danger || now-b.lastThreatAt < 2 {
+		b.regenOn = false
+		return false
+	}
+	if hpFrac < 0.55 {
+		b.regenOn = true
+	} else if hpFrac > 0.85 {
+		b.regenOn = false
+	}
+	return b.regenOn
 }
 
 func (b *Brain) escape(me *Self, mx, my *float64, boost, jump *bool) bool {
