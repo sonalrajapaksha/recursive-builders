@@ -55,3 +55,8 @@ Attach `debug` to any action (protocol.md §6) to record lines, points, and labe
 - Debug drawings are kept out of the public replay, never affect the game, and nothing on the track shows them to you.
 - Python wrapper calls: `mf.draw.line(a, b, "#ff0")`, `mf.draw.point(p)`, `mf.draw.text("hi", p)`, `mf.draw.label("chasing 7")`.
 - TypeScript wrapper calls: `draw.line(...)` and the matching helpers.
+
+---
+## Our bot (recursive-builders)
+Root `Dockerfile` runs `bot.py`. See PROGRESS.md, EXPERIMENTS.md, SUBMISSIONS.md, INTERFACE.md.
+Build: `docker build --platform linux/amd64 -t rb-bot .`; check per protocol.md §1.
