@@ -96,6 +96,7 @@ type Brain struct {
 	otherDead          int
 	stickID            int
 	stickAt, loseAt    float64
+	mpc                mpcState
 }
 
 type Params struct {
@@ -152,6 +153,7 @@ type Params struct {
 	SpeedUp     bool
 	Backstab    float64
 	LethalK     float64
+	MPC         float64
 }
 
 func DefaultParams() Params {
@@ -847,7 +849,15 @@ func (b *Brain) step(o *Obs, act *Action) {
 	if escJump {
 		act.Jump = true
 	}
-	if b.P.Dodge && mode != "unstuck" && mode != "escape" {
+	mpcDone := false
+	if b.P.MPC > 0 && mode != "unstuck" && mode != "escape" && mode != "dodge" {
+		f := foe
+		if f == nil {
+			f = target
+		}
+		mpcDone = b.mpcMove(o, f, mode, &mx, &my, &boost)
+	}
+	if b.P.Dodge && !mpcDone && mode != "unstuck" && mode != "escape" {
 		if dx, dy, lz := b.dodge(o); dx != 0 || dy != 0 {
 			mx, my = mx*0.4+dx*0.9, my*0.4+dy*0.9
 			if l := hyp(mx, my); l > 1 {
@@ -1973,6 +1983,7 @@ func squadParams(p Params) Params {
 	p.LethalK = 0.7
 	p.HPw = 0.18
 	p.LethalK = 0.75
+	p.MPC = 1
 
 	return applyTune(p)
 }
