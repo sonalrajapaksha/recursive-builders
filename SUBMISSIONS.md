@@ -23,3 +23,5 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 18 | f92c6fdf1aedbac6e2ea0e2122277d14d56cf1db (bold-cube-lord: Econ loot, drops, 90s farming tour, armor-first upgrades) | docker PASS | scored, receipt BB-78FA0F43 | 5.46 (-0.64 vs base; dropped) |
 | 19 | 5c2de260212c92cca576b2472fd4b28fd1bce13f (bold-pred-kill-engine) | docker PASS | scored, receipt BB-06D95D2B | 5.71 (-0.39 vs base; dropped) |
 | 20 | 66d5191ac43b7b4d5afb63a6d7e42e9f9d6b89b4 (tv-lr160: giddy-base + LaserRange 160 via tune.json) | docker PASS | received, receipt BB-338F7658-ish, scoring | pending |
+| 20 result | tv-lr160 66d5191 | 5.96 (receipt BB-3B8F7658): -0.14 vs base, dropped |
+| 21 | 24fe8a48a028f5ce7eb1ac3d83f639c75dacdb54 (probe-tmp: idles if /tmp marker persists) | docker PASS | received, receipt BB-F72A5C72-ish, scoring | pending; ~1.x = /tmp persists, ~6.1 = fresh container per match |
