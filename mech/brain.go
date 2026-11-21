@@ -96,62 +96,65 @@ type Brain struct {
 	otherDead          int
 	stickID            int
 	stickAt, loseAt    float64
+	lcID               int
+	lcAt               float64
 }
 
 type Params struct {
-	RetreatHP   float64
-	RecoverHP   float64
-	GunRange    float64
-	LightRange  float64
-	LaserRange  float64
-	EngageDist  float64
-	FarmNPC     bool
-	Explore     bool
-	Ghost       bool
-	HomeExpo    float64
-	LootRadius  float64
-	CrateUntil  float64
-	UseDrops    bool
-	Dodge       bool
-	NoMortar    bool
-	Peek        bool
-	LaserFirst  bool
-	CrowdHide   bool
-	Vulture     float64
-	Ambush      float64
-	LaserSeek   float64
-	Lethal      bool
-	Alert       float64
-	Shy         float64
-	EarlyHide   float64
-	Evade       bool
-	Odds        float64
-	OddsFlee    float64
-	Practice    bool
-	Stick       float64
-	HPw         float64
-	LowBonus    float64
-	MaxTarget   float64
-	LoseRule    bool
-	FightLoot   float64
-	FarmHP      float64
-	AllFoes     bool
-	CubeGoal    float64
-	Econ        bool
-	LaserUp     bool
-	EconSafe    float64
-	Opening     bool
-	NanoUp      bool
-	Finish      float64
-	FinishHP    float64
-	FinishRush  bool
-	Pursue      float64
-	FightBoost  float64
-	DodgeBoost  float64
-	ThreatBoost float64
-	SpeedUp     bool
-	Backstab    float64
-	LethalK     float64
+	RetreatHP    float64
+	RecoverHP    float64
+	GunRange     float64
+	LightRange   float64
+	LaserRange   float64
+	EngageDist   float64
+	FarmNPC      bool
+	Explore      bool
+	Ghost        bool
+	HomeExpo     float64
+	LootRadius   float64
+	CrateUntil   float64
+	UseDrops     bool
+	Dodge        bool
+	NoMortar     bool
+	Peek         bool
+	LaserFirst   bool
+	CrowdHide    bool
+	Vulture      float64
+	Ambush       float64
+	LaserSeek    float64
+	Lethal       bool
+	Alert        float64
+	Shy          float64
+	EarlyHide    float64
+	Evade        bool
+	Odds         float64
+	OddsFlee     float64
+	Practice     bool
+	Stick        float64
+	HPw          float64
+	LowBonus     float64
+	MaxTarget    float64
+	LoseRule     bool
+	FightLoot    float64
+	FarmHP       float64
+	AllFoes      bool
+	CubeGoal     float64
+	Econ         bool
+	LaserUp      bool
+	EconSafe     float64
+	Opening      bool
+	NanoUp       bool
+	Finish       float64
+	FinishHP     float64
+	FinishRush   bool
+	Pursue       float64
+	FightBoost   float64
+	DodgeBoost   float64
+	ThreatBoost  float64
+	SpeedUp      bool
+	Backstab     float64
+	LethalK      float64
+	LightCounter bool
 }
 
 func DefaultParams() Params {
@@ -160,6 +163,7 @@ func DefaultParams() Params {
 		Peek: true, LaserFirst: false, CrowdHide: true, Practice: true}
 
 	p.LaserFirst = true
+	p.LightCounter = true
 
 	return p
 }
@@ -673,6 +677,8 @@ func (b *Brain) step(o *Obs, act *Action) {
 		}
 	}
 
+	lcT := b.lightCounterTarget(o, hpFrac)
+
 	var mx, my float64
 	boost := false
 	mode := "idle"
@@ -700,6 +706,10 @@ func (b *Brain) step(o *Obs, act *Action) {
 		mx, my = b.travel(me, zgx, zgy)
 		boost = (!me.InZone || now+tNeed >= deadline) && me.Energy > 5
 		mode = "zone"
+	case lcT != nil && !b.retreat:
+		mx, my = b.travel(me, lcT.Pos[0], lcT.Pos[1])
+		boost = me.Energy > 12 && lcT.Dist > 14
+		mode = "lcounter"
 	case b.retreat && !finishing && !late:
 		if b.coverMove(o, seen, &mx, &my) {
 			boost = me.Energy > 10 && (mx != 0 || my != 0)
@@ -1088,6 +1098,9 @@ func (b *Brain) step(o *Obs, act *Action) {
 			aim[0] = me.Aim[0] + 0.35
 		}
 		aim[1] = 0
+	}
+	if lcT != nil && mode == "lcounter" {
+		b.lightCounterFire(o, lcT, &aim, act)
 	}
 	aim[1] = clamp(aim[1], st.MinPitch, st.MaxPitch)
 	act.Aim = &aim
