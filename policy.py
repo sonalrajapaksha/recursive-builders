@@ -462,6 +462,13 @@ class Policy:
             aim = [self.threat_bearing, 0.0]   # face the attacker: rear armor x1.5
         elif newest is not None and newest[1] >= 0.5:
             aim = [newest[0], 0.0]
+        if target is None and e0 is not None and gun and not reload_now:
+            # fleeing/hiding: torso aims independently of legs - keep the gun on a visible enemy (also keeps rear armor off)
+            gr = _num(_g(gun[1], "stats", "range"), 230.0)
+            tpos = _vec(e0["pos"])
+            if e0["_d"] < gr * 0.95 and self._los((pos[0], pos[1], pos[2] + eye_h), (tpos[0], tpos[1], tpos[2] + 4.5)):
+                aim, f2 = self._aim_fire(e0, "mech", pos, mz, eye_h, aim_now, {"gun": gun}, energy, t)
+                fire[gun[0]] = f2[gun[0]]
         if reload_now:
             act["reload"] = True
 
