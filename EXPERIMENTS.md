@@ -30,3 +30,5 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E26 | official abl-shootback (b5bcf62) | 4.31 vs combo2 4.54: -0.23. Shoot-back-while-fleeing likely the cause of combo3's drop; DROP it. |
 | E27 | lightning-rush 3f03885 docker check PASS p99 2.0ms | submitted as #12 |
 | E28 | official lightning-rush (3f03885) | 4.13: worse. Rushing/closing hurts. All 8 variants since aggressor2 sit 4.1-4.5 (mean ~4.3): combo2 4.54 may be partly lucky; run-to-run noise ~±0.2. Micro-ablation exhausted. |
+| E29 | cover-routes 946014f docker PASS (load 2.6s ready, p99 7.8ms); worker says effect modest (~0.05 less exposure, +1.5% path) | not submitted yet; low expected gain |
+| E30 | repeat-run of combo2 submitted (#13) | measures noise; if ~4.3 then true level ~4.3 and 4.54 was partly luck |
