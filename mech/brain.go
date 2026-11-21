@@ -1446,6 +1446,11 @@ func (b *Brain) fightMove(o *Obs, tg *Track, seen []*Track, wantLos float64) (fl
 			}
 		}
 		s -= b.zonePenalty(&o.Zone, cx, cy)
+		if o.Zone.NextRadius <= 70 || o.Alive <= 3 {
+			// Late game: stand nearer the zone center than the target so chasers eat zone damage first.
+			nc := o.Zone.NextCenter
+			s += clamp(0.25*(hyp(tg.Pos[0]-nc[0], tg.Pos[1]-nc[1])-hyp(cx-nc[0], cy-nc[1])), -8, 8)
+		}
 		if cube != nil {
 			s += 1.5 * (hyp(cube.Pos[0]-x, cube.Pos[1]-y) - hyp(cube.Pos[0]-cx, cube.Pos[1]-cy))
 		}
