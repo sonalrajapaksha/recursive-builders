@@ -408,6 +408,7 @@ class Policy:
 
         # ---- target selection
         target, ttype = None, None
+        fire_tgt = None   # visible enemy we shoot at without changing movement (always-fire gun)
         engaged = False
         if e0 and not zone_urgent or (e0 and provoked):
             pool = [e for e in vis if e["_d"] < 280]
@@ -426,6 +427,8 @@ class Policy:
                 engaged = provoked or tgt["_d"] < 110 or (ehp_f < 0.4 and tgt["_d"] < 260) or bool(tgt.get("charging"))
                 if engaged and (not flee or provoked):
                     target, ttype = tgt, "mech"
+                elif not flee and not zone_urgent:
+                    fire_tgt = tgt
         farm_ok = (target is None and not flee and not zone_urgent and hpf > 0.5 and not [e for e in vis if e["_d"] < 70])
         farm_target = None
         if farm_ok:
@@ -456,6 +459,11 @@ class Policy:
                 reload_now = True
         if target is not None:
             aim, fire = self._aim_fire(target, ttype, pos, mz, eye_h, aim_now, wk, energy, t)
+        elif fire_tgt is not None:
+            # visible but not engaged: shoot anyway (movement unchanged); never preemptively reload while it is in view
+            aim, fire = self._aim_fire(fire_tgt, "mech", pos, mz, eye_h, aim_now, wk, energy, t)
+            if gun and _num(gun[1].get("ammo"), 1) > 0:
+                reload_now = False
         elif e0 is not None:
             aim = [math.atan2(e0["pos"][1] - pos[1], e0["pos"][0] - pos[0]), 0.0]   # face visible enemy (rear armor x1.5)
         elif self.threat_bearing is not None and t - self.threat_t < 2.5:
