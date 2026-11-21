@@ -29,3 +29,4 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E25 | plan | Structural round: A 'lightning-rush' (weapon doctrine: close to <=45m, lightning beats laser, DPS math), B 'cover-routes' (exposure-weighted nav using static map). Ablations (abl-shootback running; abl-quiet, abl-reload, diag-bots queued) continue in parallel. |
 | E26 | official abl-shootback (b5bcf62) | 4.31 vs combo2 4.54: -0.23. Shoot-back-while-fleeing likely the cause of combo3's drop; DROP it. |
 | E27 | lightning-rush 3f03885 docker check PASS p99 2.0ms | submitted as #12 |
+| E28 | official lightning-rush (3f03885) | 4.13: worse. Rushing/closing hurts. All 8 variants since aggressor2 sit 4.1-4.5 (mean ~4.3): combo2 4.54 may be partly lucky; run-to-run noise ~±0.2. Micro-ablation exhausted. |
