@@ -96,6 +96,7 @@ type Brain struct {
 	otherDead          int
 	stickID            int
 	stickAt, loseAt    float64
+	boldLate           bool
 }
 
 type Params struct {
@@ -336,7 +337,7 @@ func (b *Brain) observe(o *Obs) {
 		b.pracOn = on
 		b.P = b.base
 		if on {
-			b.P = squadParams(b.base)
+			b.P = boldSquad(b.base, now > bPhaseT)
 		}
 	}
 	if open := b.base.Opening && !b.notPractice && !b.pracOn && b.startAlive-o.Alive-b.kills <= 0; open != b.openOn {
@@ -345,8 +346,13 @@ func (b *Brain) observe(o *Obs) {
 		if open {
 			b.P.LaserFirst, b.P.LaserSeek, b.P.LootRadius = true, 240, 150
 		} else if b.pracOn {
-			b.P = squadParams(b.base)
+			b.P = boldSquad(b.base, now > bPhaseT)
 		}
+	}
+
+	if b.pracOn && (now > bPhaseT) != b.boldLate {
+		b.boldLate = now > bPhaseT
+		b.P = boldSquad(b.base, b.boldLate)
 	}
 
 	z := &o.Zone
