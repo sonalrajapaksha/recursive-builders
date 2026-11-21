@@ -27,4 +27,5 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 21 | 24fe8a48a028f5ce7eb1ac3d83f639c75dacdb54 (probe-tmp: idles if /tmp marker persists) | docker PASS | received, receipt BB-F72A5C72-ish, scoring | pending; ~1.x = /tmp persists, ~6.1 = fresh container per match |
 | 21 result | probe-tmp 24fe8a4 | 6.10 (BB-F72A5C72): same as base => scorer uses a fresh container per match; cross-match learning impossible |
 | 22 | e31d3b8e66c96da8ac58811fef3f70adf89df784 (tv-lseek320) | 6.10 (BB-7AA9E919): knob has no effect |
-| 23 | 7a64e1596aabbdd092bd6e8c4a19d6acf3a284c3 (tv-floot110) | submitted, scoring (receipt BB-16B…) | pending |
+| 23 | 7a64e1596aabbdd092bd6e8c4a19d6acf3a284c3 (tv-floot110) | scored, receipt BB-16E0129E | 5.81 (-0.29 vs base; dropped) |
+| 24 | 9f7a9107346d73aaf1920f197cc158fbf535474b (tv-maxt320) | docker PASS | received, receipt BB-F2E55F1E-ish, scoring | pending |
