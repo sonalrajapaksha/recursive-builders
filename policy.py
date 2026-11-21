@@ -561,8 +561,10 @@ class Policy:
         elif goal is None:
             # cubes, supply drop, then hide
             safe_to_wander = not vis and hpf > 0.35 and not provoked
+            drops_live = bool(obs.get("drops"))
+            drop_ok = safe_to_wander or (drops_live and hpf > 0.5 and not provoked and (not vis or e0["_d"] > 70))
             drop = self._drop_goal(obs, pos, walk, zone_ok, enemies, hpf)
-            if drop is not None and safe_to_wander:
+            if drop is not None and drop_ok:
                 mode = "drop"
                 goal = drop[0]
                 if drop[1]:
@@ -687,7 +689,7 @@ class Policy:
             dist = hyp(dp[0] - pos[0], dp[1] - pos[1])
             if dist > 320 or not zone_ok(dp, 5.0):
                 continue
-            if (max(dist - r, 0) / max(walk, 1.0)) > lands + 25:
+            if (max(dist - r, 0) / max(walk, 1.0)) > lands + 40:
                 continue
             contested = [e for e in enemies if hyp(e["pos"][0] - dp[0], e["pos"][1] - dp[1]) < r + 20]
             if len(contested) >= 2 and hpf < 0.7:
