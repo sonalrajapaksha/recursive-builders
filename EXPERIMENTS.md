@@ -8,3 +8,4 @@
 Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav because recorded hello map dir is not local.
 | E5 | official v1 practice (48 matches vs house squad) | 3.56 (mean place ~12.4). rank-32 ~4.92, top ~5.6 |
 | E6 | official survival-hider (7da1928): silent walk, cover hiding, flee-more, less loot/cubes | 2.15 vs v1 3.56. FALSIFIED: passivity/less loot loses badly vs hunting squad. Don't submit more passive variants. Best remains v1 (5f096bc). |
+| E7 | official aggressor (74bbadc): boost-loot, engage more, damage upgrades | 3.88 vs v1 3.56. Direction confirmed: capability beats passivity. |
