@@ -34,3 +34,4 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E30 | repeat-run of combo2 submitted (#13) | measures noise; if ~4.3 then true level ~4.3 and 4.54 was partly luck |
 | E31 | official combo2 repeat (#13, bff0082) | 4.63 vs 4.54 first run: run-to-run noise only ~±0.05, so differences >=0.15 are real. Combo2 true level ~4.58. Submission quota gives ~4/hr until cutoff => hill-climbing with single changes is viable. |
 | E32 | decision | User chose to adopt the public MIT bot giddygiddyboy (reported 6.19 on board) as base on branch giddy-base; our Python bot kept on other branches. Improve it step by step with single-change ablations; scores deterministic for that bot per its README. |
+| E33 | official giddy-base (7447211) | 6.10: ~top 10-12 on board; 6.0 target reached on practice. Now best entry and final pick. Next: gx-cube, gx-kill workers improve it with single-change branches; combo2 (4.63) demoted. |
