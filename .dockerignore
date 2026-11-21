@@ -1,3 +1,5 @@
 *
-!*.py
+!go.mod
+!cmd/**
+!mech/**
 !Dockerfile

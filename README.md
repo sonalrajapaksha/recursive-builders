@@ -60,3 +60,6 @@ Attach `debug` to any action (protocol.md §6) to record lines, points, and labe
 ## Our bot (recursive-builders)
 Root `Dockerfile` runs `bot.py`. See PROGRESS.md, EXPERIMENTS.md, SUBMISSIONS.md, INTERFACE.md.
 Build: `docker build --platform linux/amd64 -t rb-bot .`; check per protocol.md §1.
+
+## giddy-base
+This branch runs the MIT-licensed Go bot from https://github.com/justnau/giddygiddyboy-mech-royale @ edbdb6b (cmd/, mech/, go.mod, Dockerfile unchanged). License: LICENSE-giddygiddyboy. Our own improvements are layered on top in later commits.
