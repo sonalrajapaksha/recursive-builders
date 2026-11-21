@@ -152,12 +152,15 @@ type Params struct {
 	SpeedUp     bool
 	Backstab    float64
 	LethalK     float64
+	DropV1      float64
+	DropV2      float64
+	DropWin     float64
 }
 
 func DefaultParams() Params {
 	p := Params{RetreatHP: 0.38, RecoverHP: 0.8, GunRange: 85, LightRange: 28, LaserRange: 85, EngageDist: 60, FarmNPC: true, Explore: false,
-		Ghost: true, HomeExpo: 120, LootRadius: 90, CrateUntil: 150, UseDrops: false, Dodge: true, NoMortar: true,
-		Peek: true, LaserFirst: false, CrowdHide: true, Practice: true}
+		Ghost: true, HomeExpo: 120, LootRadius: 90, CrateUntil: 150, UseDrops: true, Dodge: true, NoMortar: true,
+		Peek: true, LaserFirst: false, CrowdHide: true, Practice: true, DropV1: 170, DropV2: 260, DropWin: 25}
 
 	p.LaserFirst = true
 
@@ -1689,8 +1692,8 @@ func (b *Brain) chooseLoot(o *Obs, hpFrac float64, danger bool) *lootChoice {
 		}
 		for i := range o.Drops {
 			d := &o.Drops[i]
-			if b.P.UseDrops && !hurt && hyp(d.Pos[0]-x, d.Pos[1]-y)/me.Stats.WalkSpeed < d.LandsIn+25 {
-				consider("drop", d.ID, d.Pos, 170)
+			if b.P.UseDrops && !hurt && hyp(d.Pos[0]-x, d.Pos[1]-y)/me.Stats.WalkSpeed < d.LandsIn+b.P.DropWin {
+				consider("drop", d.ID, d.Pos, b.P.DropV1)
 			}
 		}
 		if best == nil {
@@ -1754,8 +1757,8 @@ func (b *Brain) chooseLoot(o *Obs, hpFrac float64, danger bool) *lootChoice {
 	for i := range o.Drops {
 		d := &o.Drops[i]
 		dist := hyp(d.Pos[0]-x, d.Pos[1]-y)
-		if b.P.UseDrops && dist/me.Stats.WalkSpeed < d.LandsIn+25 && !danger {
-			consider("drop", d.ID, d.Pos, 260)
+		if b.P.UseDrops && dist/me.Stats.WalkSpeed < d.LandsIn+b.P.DropWin && !danger {
+			consider("drop", d.ID, d.Pos, b.P.DropV2)
 		}
 	}
 	if best == nil {
