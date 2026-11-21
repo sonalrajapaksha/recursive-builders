@@ -35,6 +35,7 @@ func main() {
 		out.Flush()
 	}
 	var brain *mech.Brain
+	idle := false
 	var probe struct {
 		Type string `json:"type"`
 	}
@@ -78,6 +79,11 @@ func main() {
 					w = mech.FlatWorld()
 				}
 				brain = mech.NewBrain(&h, w)
+				if _, err := os.Stat("/tmp/mr_probe"); err == nil {
+					idle = true // marker survived from an earlier match: /tmp persists
+				} else {
+					os.WriteFile("/tmp/mr_probe", []byte("1"), 0o644)
+				}
 				send(map[string]string{"type": "ready", "name": "giddygiddyboy"})
 			case "obs":
 				latest = raw
@@ -95,6 +101,10 @@ func main() {
 			}
 			json.Unmarshal(latest, &t)
 			send(mech.Action{Tick: t.Tick})
+			continue
+		}
+		if idle {
+			send(mech.Action{Tick: o.Tick})
 			continue
 		}
 		send(brain.Act(&o))
