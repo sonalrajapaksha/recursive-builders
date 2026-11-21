@@ -99,59 +99,60 @@ type Brain struct {
 }
 
 type Params struct {
-	RetreatHP   float64
-	RecoverHP   float64
-	GunRange    float64
-	LightRange  float64
-	LaserRange  float64
-	EngageDist  float64
-	FarmNPC     bool
-	Explore     bool
-	Ghost       bool
-	HomeExpo    float64
-	LootRadius  float64
-	CrateUntil  float64
-	UseDrops    bool
-	Dodge       bool
-	NoMortar    bool
-	Peek        bool
-	LaserFirst  bool
-	CrowdHide   bool
-	Vulture     float64
-	Ambush      float64
-	LaserSeek   float64
-	Lethal      bool
-	Alert       float64
-	Shy         float64
-	EarlyHide   float64
-	Evade       bool
-	Odds        float64
-	OddsFlee    float64
-	Practice    bool
-	Stick       float64
-	HPw         float64
-	LowBonus    float64
-	MaxTarget   float64
-	LoseRule    bool
-	FightLoot   float64
-	FarmHP      float64
-	AllFoes     bool
-	CubeGoal    float64
-	Econ        bool
-	LaserUp     bool
-	EconSafe    float64
-	Opening     bool
-	NanoUp      bool
-	Finish      float64
-	FinishHP    float64
-	FinishRush  bool
-	Pursue      float64
-	FightBoost  float64
-	DodgeBoost  float64
-	ThreatBoost float64
-	SpeedUp     bool
-	Backstab    float64
-	LethalK     float64
+	RetreatHP     float64
+	RecoverHP     float64
+	GunRange      float64
+	LightRange    float64
+	LaserRange    float64
+	EngageDist    float64
+	FarmNPC       bool
+	Explore       bool
+	Ghost         bool
+	HomeExpo      float64
+	LootRadius    float64
+	CrateUntil    float64
+	UseDrops      bool
+	Dodge         bool
+	NoMortar      bool
+	Peek          bool
+	LaserFirst    bool
+	CrowdHide     bool
+	Vulture       float64
+	Ambush        float64
+	LaserSeek     float64
+	Lethal        bool
+	Alert         float64
+	Shy           float64
+	EarlyHide     float64
+	Evade         bool
+	Odds          float64
+	OddsFlee      float64
+	Practice      bool
+	Stick         float64
+	HPw           float64
+	LowBonus      float64
+	MaxTarget     float64
+	LoseRule      bool
+	FightLoot     float64
+	FarmHP        float64
+	AllFoes       bool
+	CubeGoal      float64
+	Econ          bool
+	LaserUp       bool
+	EconSafe      float64
+	Opening       bool
+	NanoUp        bool
+	Finish        float64
+	FinishHP      float64
+	FinishRush    bool
+	Pursue        float64
+	FightBoost    float64
+	DodgeBoost    float64
+	ThreatBoost   float64
+	SpeedUp       bool
+	Backstab      float64
+	LethalK       float64
+	MortarBattery bool
 }
 
 func DefaultParams() Params {
@@ -160,6 +161,7 @@ func DefaultParams() Params {
 		Peek: true, LaserFirst: false, CrowdHide: true, Practice: true}
 
 	p.LaserFirst = true
+	p.MortarBattery = true
 
 	return p
 }
@@ -1034,7 +1036,7 @@ func (b *Brain) step(o *Obs, act *Action) {
 					}
 				}
 			case "mortar":
-				if !isMech || w.Cooldown > 0.25 || dist < 16 || dist > 200 {
+				if b.P.MortarBattery || !isMech || w.Cooldown > 0.25 || dist < 16 || dist > 200 {
 					break
 				}
 				tube := Vec3{muzzle[0], muzzle[1], zf + st.Height + 0.5}
@@ -1088,6 +1090,9 @@ func (b *Brain) step(o *Obs, act *Action) {
 			aim[0] = me.Aim[0] + 0.35
 		}
 		aim[1] = 0
+	}
+	if b.P.MortarBattery {
+		b.mortarBattery(o, target, &aim, act)
 	}
 	aim[1] = clamp(aim[1], st.MinPitch, st.MaxPitch)
 	act.Aim = &aim
@@ -1182,8 +1187,13 @@ func (b *Brain) wantPickup(me *Self, kind string) bool {
 	if i, _ := hasWeapon(me.Weapons, kind); i >= 0 {
 		return false
 	}
-	if kind == "mortar" && b.P.NoMortar {
+	if kind == "mortar" && b.P.NoMortar && !b.P.MortarBattery {
 		return false
+	}
+	if b.P.MortarBattery && kind == "lightning" {
+		if j, _ := hasWeapon(me.Weapons, "mortar"); j >= 0 {
+			return false // mortar beats lightning: keep it
+		}
 	}
 	rank := func(k string) int {
 		if b.P.LaserFirst && k == "laser" {
@@ -1217,6 +1227,10 @@ func (b *Brain) lead(muzzle, tp, tv Vec3, speed float64, grounded bool) (float64
 }
 
 func (b *Brain) mortar(tube, foot, tv Vec3, v, g float64, st *MechStats) (yaw, pitch float64, ok bool) {
+	return b.mortarArc(tube, foot, tv, v, g, st, false)
+}
+
+func (b *Brain) mortarArc(tube, foot, tv Vec3, v, g float64, st *MechStats, high bool) (yaw, pitch float64, ok bool) {
 	if v <= 0 || g <= 0 {
 		return 0, 0, false
 	}
@@ -1229,7 +1243,11 @@ func (b *Brain) mortar(tube, foot, tv Vec3, v, g float64, st *MechStats) (yaw, p
 		if disc < 0 || dx < 1 {
 			return 0, 0, false
 		}
-		pitch = math.Atan((v*v - math.Sqrt(disc)) / (g * dx))
+		if high {
+			pitch = math.Atan((v*v + math.Sqrt(disc)) / (g * dx))
+		} else {
+			pitch = math.Atan((v*v - math.Sqrt(disc)) / (g * dx))
+		}
 		yaw = math.Atan2(py-tube[1], px-tube[0])
 		t = dx / (v * math.Cos(pitch))
 	}
