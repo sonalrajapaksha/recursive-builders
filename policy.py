@@ -788,6 +788,7 @@ class Policy:
         muzzle = [pos[0], pos[1], pos[2] + mz]
         eye = [pos[0], pos[1], pos[2] + eye_h]
         los = self._los(eye, tc)
+        speed_t = hyp(tv[0], tv[1])
 
         def aim_at(point):
             dh = hyp(point[0] - muzzle[0], point[1] - muzzle[1])
@@ -813,7 +814,10 @@ class Policy:
                 "lightning" in (target.get("weapons") or []) and d < 60 and _num(laser[1].get("charge"), 0) <= 0) and (
                 _num(laser[1].get("charge"), 0) > 0 or _num(laser[1].get("cooldown"), 0) <= 0.7):
             mode = "laser"
-        elif mort and 22 < d < 200 and _num(mort[1].get("cooldown"), 0) <= 0.6 and (not gun or d > 55 or not los):
+        elif mort and 25 < d < 215 and _num(mort[1].get("cooldown"), 0) <= 0.6 and (not gun or d > 55 or not los) and (
+                speed_t < 3.0 or not los or not gun or d < 90):
+            # shell flight is 1.5-3 s: lead on a strafing target is a coin flip, so lob only at stationary/hiding
+            # (no-LOS) targets, or short range where the shell is quick and the splash forgives
             mode = "mortar"
         if mode == "gun" and not gun:
             mode = "none"
