@@ -12,3 +12,4 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 8 | bff00824a32cc2c4f275281839cc2d9e0a0874f5 (branch combo2 = combo1 + aggressor3 + gearup) | 2026-11-21 22:58 NZDT | scored (BB-E97BDD84) | 4.54 (BEST) |
 | 9 | 627c6156e83a5b47879e01ff037381b3500a51ac (branch combo3 = combo2 + laser sidestep commit + shoot-back while fleeing + reload fix + quiet hide) | 2026-11-21 23:02 NZDT | scored (BB-2A8D6D84) | 4.27 (worse than combo2 4.54; score provided by user) |
 | 10 | 430547c93ff48a651d38574749092e2b3a182755 (branch laser-cover = combo2 + cover/committed-sidestep laser defence) | 2026-11-22 00:00 NZDT | scored (BB-07D57AE8) | 4.44 (vs combo2 4.54: noise, no gain; score provided by user) |
+| 11 | b5bcf62816f9ee184e6cdbd20ab6b57d7db8c9ee (branch abl-shootback = combo2 + shoot-back-while-fleeing only) | 2026-11-22 00:02 NZDT | received, receipt BB-8B5C5715, scoring | pending |
