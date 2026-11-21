@@ -21,4 +21,5 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 16 | 53e6cd3867d2819ef88d388d906d7366b6eaccc2 (gx-kill-zonecenter, giddy-base + late-game zone-center bias) | docker PASS | scored, receipt BB-0A6AABA8 | 6.10 (identical to giddy-base: no practice effect) |
 | 17 | 617ea065014b4a8720a24c4957c4b47590058394 (gx-cube-radius, giddy-base + visible-cube chase radius 63->110m, cubeV 100) | docker PASS | scored, receipt BB-2B752C79 | 6.04 (slightly below base; dropped) |
 | 18 | f92c6fdf1aedbac6e2ea0e2122277d14d56cf1db (bold-cube-lord: Econ loot, drops, 90s farming tour, armor-first upgrades) | docker PASS | scored, receipt BB-78FA0F43 | 5.46 (-0.64 vs base; dropped) |
-| 19 | 5c2de260212c92cca576b2472fd4b28fd1bce13f (bold-pred-kill-engine) | docker PASS | received, receipt BB-36D95028-ish, scoring | pending |
+| 19 | 5c2de260212c92cca576b2472fd4b28fd1bce13f (bold-pred-kill-engine) | docker PASS | scored, receipt BB-06D95D2B | 5.71 (-0.39 vs base; dropped) |
+| 20 | 66d5191ac43b7b4d5afb63a6d7e42e9f9d6b89b4 (tv-lr160: giddy-base + LaserRange 160 via tune.json) | docker PASS | received, receipt BB-338F7658-ish, scoring | pending |
