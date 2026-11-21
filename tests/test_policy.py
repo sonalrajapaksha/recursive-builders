@@ -335,6 +335,30 @@ def test_no_laser_charge_into_lightning_holder():
     assert a["fire"][1], a
 
 
+def test_lightning_ranked_above_laser_and_mortar():
+    p = mk()
+    assert p._weapon_value("lightning", 5.0) > p._weapon_value("laser", 5.0) > p._weapon_value("mortar", 5.0)
+
+
+def test_rush_laser_holder_with_lightning():
+    o = base_obs()
+    o["self"]["weapons"][1] = {"kind": "lightning", "cooldown": 0, "stats": HELLO["config"]["weapons"]["lightning"]}
+    o["self"]["energy"] = 100
+    o["mechs"] = [enemy(5, 150, 0, weapons=("gun", "laser"))]
+    a = Policy(HELLO, StubNav()).act(o)
+    assert a["move"][0] > 0.5 and a["boost"], a
+
+
+def test_gun_only_closes_on_laser_holder():
+    o = base_obs()
+    o["self"]["energy"] = 100
+    o["mechs"] = [enemy(5, 150, 0, weapons=("gun", "laser"))]
+    a = Policy(HELLO, StubNav()).act(o)
+    assert a["move"][0] > 0.5, a   # not idling in its open line at 150 m
+    p = Policy(HELLO, StubNav())
+    assert p._pref_range(o["mechs"][0], {"gun": (0, {})}, "mech") <= 45
+
+
 if __name__ == "__main__":
     fails = 0
     for name, fn in sorted(globals().items()):

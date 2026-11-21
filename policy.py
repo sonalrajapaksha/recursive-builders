@@ -273,7 +273,7 @@ class Policy:
         if kind == "laser":
             return 3.6 + 1.5 * f["mortar"] - 2.0 * f["lightning"]
         if kind == "lightning":
-            return 3.0 + 1.5 * f["laser"] - 1.0 * f["mortar"]
+            return 4.6 + 1.5 * f["laser"] - 1.0 * f["mortar"]   # 240 dps, shorts lasers: top pick
         if kind == "mortar":
             v = 2.0 + 1.5 * f["lightning"] - 3.0 * f["laser"]
             if c["laser"] > 0:
@@ -424,6 +424,8 @@ class Policy:
             if tgt is not None:
                 ehp_f = _num(tgt.get("hp"), mhp) / max(_num(tgt.get("max_hp"), mhp), 1)
                 engaged = provoked or tgt["_d"] < 110 or (ehp_f < 0.4 and tgt["_d"] < 260) or bool(tgt.get("charging"))
+                if not engaged and hpf > 0.5 and tgt["_d"] < 200 and "laser" in (tgt.get("weapons") or []):
+                    engaged = True   # never idle in a laser holder's open line: close the distance
                 if engaged and (not flee or provoked):
                     target, ttype = tgt, "mech"
         farm_ok = (target is None and not flee and not zone_urgent and hpf > 0.5 and not [e for e in vis if e["_d"] < 70])
@@ -555,9 +557,11 @@ class Policy:
                 boost_pref = False
             elif ttype != "mech" and d > max(pref + 30, 60):
                 boost_pref = True
-            elif ttype == "mech" and d > pref + 30 and energy > 40 and (
-                    _num(target.get("hp"), mhp) < 0.4 * _num(target.get("max_hp"), mhp) and hpf > 0.5):
-                boost_pref = True   # third-party: run down a weakened mech
+            elif ttype == "mech" and d > pref + 30 and energy > 40 and hpf > 0.5 and (
+                    _num(target.get("hp"), mhp) < 0.4 * _num(target.get("max_hp"), mhp)
+                    or (("lightning" in wk and "mortar" not in (target.get("weapons") or []))
+                        or "laser" in (target.get("weapons") or []) and "laser" not in wk)):
+                boost_pref = True   # run down a weakened mech / rush into lightning range / close on a laser holder
         elif goal is None:
             # cubes, supply drop, then hide
             safe_to_wander = not vis and hpf > 0.35 and not provoked
@@ -666,6 +670,8 @@ class Policy:
             if "mortar" in tw:
                 return lr * 1.9 if "gun" in wk else lr * 1.9   # mortar beats lightning: stay out
             return lr * 0.7
+        if "laser" in tw and "laser" not in wk and "mortar" not in wk:
+            return 40.0       # gun only vs laser holder: it out-trades us at range, so close in
         if "laser" in wk:
             if "lightning" in tw:
                 return 70.0       # lightning shorts us: keep out of its 45 m range
