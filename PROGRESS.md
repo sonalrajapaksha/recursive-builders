@@ -11,5 +11,5 @@ tests/ (unittest: `python3 -I -m unittest discover -s tests`), eval/ (sim approx
 - Official check.py: PASS native (p99 1.5ms) and in Docker sandbox amd64 (p99 3.2ms emulated).
 - eval/sim.py is a crude approximation, NOT a real match. Real scores only come from the site.
 ## Next
-1. Submit v1 via joinbuilders.org (Chrome ext), record in SUBMISSIONS.md. Quota 4/hour.
+1. v1 submitted (see SUBMISSIONS.md). Check site for score; 3 submissions left this hour at submit time.
 2. Read score + leaderboard; target weakest area (see EXPERIMENTS.md, eval/STRATEGY.md).
