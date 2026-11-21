@@ -1983,7 +1983,7 @@ func squadParams(p Params) Params {
 	p.LethalK = 0.7
 	p.HPw = 0.18
 	p.LethalK = 0.75
-	p.MPC = 1
+	p.MPC = 2
 
 	return applyTune(p)
 }
