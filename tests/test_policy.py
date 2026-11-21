@@ -335,6 +335,24 @@ def test_no_laser_charge_into_lightning_holder():
     assert a["fire"][1], a
 
 
+def test_low_hp_breaks_los_then_holds():
+    class Wall(StubNav):
+        # a wall at x in [-6,-4]: blocks sight between points on opposite sides; x<-5 is cover from an enemy at +x
+        def los(self, a, b):
+            return not (a[0] > -4 and b[0] < -5)
+
+        def blocked(self, x, y, z=None):
+            return False
+    o = base_obs()
+    o["self"]["hp"] = 350
+    o["mechs"] = [enemy(5, 80, 0, hp=1400)]
+    a = Policy(HELLO, Wall()).act(o)
+    assert a["move"][0] < -0.3, a      # runs to the cover point behind the wall
+    o["self"]["pos"] = [-20.0, 0.0, 0.0]
+    a = Policy(HELLO, Wall()).act(o)
+    assert a["move"] == [0.0, 0.0] and not a["boost"], a   # hidden: hold and heal
+
+
 if __name__ == "__main__":
     fails = 0
     for name, fn in sorted(globals().items()):

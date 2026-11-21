@@ -378,7 +378,7 @@ class Policy:
             ehp = _num(e0.get("hp"), mhp)
             if n_close >= 3:
                 flee = True
-            elif hpf < 0.35 and ehp > 0.5 * hp:
+            elif hpf < 0.45 and ehp > 0.5 * hp:
                 flee = True
         if flee and e0 and e0["_d"] < 22 and hpf > 0.2 and n_close < 3:
             flee = False  # cornered at melee range: fight back
@@ -517,6 +517,12 @@ class Policy:
             mx, my = unit(ax * 1.0 + gx * 0.35 + px * 0.35 * self.strafe, ay * 1.0 + gy * 0.35 + py * 0.35 * self.strafe)
             move_dir = (mx, my)
             boost_pref = True
+            cov = self._cover(pos, vis[:3])
+            if cov == "hold":
+                move_dir = (0.0, 0.0)   # out of sight: stand still, regen 45 HP/s after 5 s without damage
+                boost_pref = False
+            elif cov is not None:
+                goal, move_dir = cov, None
         elif target is not None and ttype in ("mech", "npc", "crate") and (engaged or farm_target is not None):
             mode = "fight" if ttype == "mech" else "farm"
             tp = _vec(target["pos"])
@@ -633,6 +639,35 @@ class Policy:
         return act
 
     # ------------------------------------------------------------------ pieces
+    def _cover(self, pos, foes):
+        """Break line of sight to foes (<= 3): "hold" if already hidden, else a nearby hidden point, else None."""
+        if not (self.nav_ok and self.nav is not None) or not foes:
+            return None
+        far = [e for e in foes if e["_d"] > 30]
+        if len(far) < len(foes):
+            return None   # a foe is close: keep running/fighting
+
+        def hidden(x, y):
+            return not any(self._los([e["pos"][0], e["pos"][1], e["pos"][2] + 8.0], [x, y, pos[2] + 8.0]) for e in foes)
+        if hidden(pos[0], pos[1]):
+            return "hold"
+        ex, ey = unit(foes[0]["pos"][0] - pos[0], foes[0]["pos"][1] - pos[1])
+        best, bs = None, 1e9
+        for r in (10.0, 18.0, 28.0):
+            for k in range(16):
+                a = k * math.pi / 8
+                c, s = math.cos(a), math.sin(a)
+                x, y = pos[0] + c * r, pos[1] + s * r
+                try:
+                    if self.nav.blocked(x, y) or not hidden(x, y):
+                        continue
+                except Exception:
+                    return None
+                sc = r + 20.0 * max(0.0, c * ex + s * ey)   # prefer cover away from the foe
+                if sc < bs:
+                    bs, best = sc, (x, y)
+        return best
+
     def _pref_range(self, target, wk, ttype):
         if ttype != "mech":
             return 28.0 if "lightning" in wk else 45.0
