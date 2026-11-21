@@ -1,15 +1,6 @@
 # PROGRESS (resume here)
-Goal: Mech Royale (mechfight/1). Score = mean(16-place) over FFA matches; top 32 practice -> qualification -> 16 finals.
-Limits (protocol.md §3): 1 CPU, 512MB, 50ms/decision, RO root, 64MB /tmp, 20MB repo, 10min build, linux/amd64.
-
-## Layout
-bot.py (entry) -> policy.py (decisions) -> nav.py (map/A*/stuck). mechfight.py = starter wrapper. INTERFACE.md = contract.
-tests/ (unittest: `python3 -I -m unittest discover -s tests`), eval/ (sim approximation, latency, synthetic, STRATEGY.md).
-
-## Status
-- v1 baseline built by 3 workers (Sonnet nav, Sonnet policy, Terra eval). All local tests pass.
-- Official check.py: PASS native (p99 1.5ms) and in Docker sandbox amd64 (p99 3.2ms emulated).
-- eval/sim.py is a crude approximation, NOT a real match. Real scores only come from the site.
-## Next
-1. v1 submitted (see SUBMISSIONS.md). Check site for score; 3 submissions left this hour at submit time.
-2. Read score + leaderboard; target weakest area (see EXPERIMENTS.md, eval/STRATEGY.md).
+Goal: Mech Royale. Score=mean(16-place). Need top 20 (~5.1+). Best so far: audit-aggressor d315858 = 4.25.
+Layout: bot.py -> policy.py -> nav.py. INTERFACE.md contract. Branches on origin: audit-fixes, aggressor, audit-aggressor, aggressor2, survival-hider.
+Learned: passivity LOSES (2.15). Bug fixes + aggression WIN (4.25). Site: one submission scoring at a time, 4/hr. Local sim unreliable.
+Flow: worker branch -> docker amd64 sandbox check.py -> push branch -> submit commit via Chrome -> record SUBMISSIONS.md.
+Next: read aggressor2 score (BB-FF691224); keep the best as base; iterate on combat quality.
