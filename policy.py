@@ -123,6 +123,7 @@ class Policy:
         self.errs = 0
         self.mode = "init"
         self.nav_ok = nav is not None
+        self.laser_side = {}   # charging enemy id -> committed sidestep sign
         self.seen = {}         # remembered loot: ('p'|'c', id) -> (item dict, t)
 
     # ------------------------------------------------------------------ public
@@ -754,6 +755,8 @@ class Policy:
                 dy += ux * sgn
                 w = max(w, 0.7 if tc > 0.3 else 1.0)
         # charging lasers aimed at us
+        for k in [k for k in self.laser_side if not any(e.get("id") == k and e.get("charging") for e in enemies)]:
+            del self.laser_side[k]
         for e in enemies:
             if not e.get("charging"):
                 continue
@@ -769,7 +772,9 @@ class Policy:
             if err < math.atan2(rad + 2.0, d) + 0.12:
                 ux, uy = math.cos(ea[0]), math.sin(ea[0])
                 side = (cx - ep[0]) * -uy + (cy - ep[1]) * ux
-                sgn = 1.0 if side >= 0 else -1.0
+                # commit to one side for the whole charge: the shooter's aim tracks us, so re-picking the
+                # side each tick made us oscillate in place (recorded stream: 3 of 4 lasers hit)
+                sgn = self.laser_side.setdefault(e.get("id"), 1.0 if side >= 0 else -1.0)
                 dx += -uy * sgn
                 dy += ux * sgn
                 w = max(w, 0.9)

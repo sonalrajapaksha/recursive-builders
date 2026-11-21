@@ -348,3 +348,16 @@ if __name__ == "__main__":
                 print("FAIL", name, repr(e))
                 traceback.print_exc()
     sys.exit(1 if fails else 0)
+
+
+def test_laser_dodge_commits_to_one_side():
+    p = mk()
+    sides = []
+    for i, off in enumerate((1.0, -1.0, 1.5, -0.5)):   # aim wobbles around us while the laser charges
+        o = base_obs()
+        o["tick"], o["t"] = 100 + 2 * i, 5.0 + 0.1 * i
+        e = enemy(9, 150.0, 0.0, weapons=("laser",), charging=True, aim=(math.pi + off / 150.0, 0))
+        o["mechs"] = [e]
+        a = p.act(o)
+        sides.append(math.copysign(1, a["move"][1]))
+    assert len(set(sides)) == 1, sides
