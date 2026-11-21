@@ -96,6 +96,8 @@ type Brain struct {
 	otherDead          int
 	stickID            int
 	stickAt, loseAt    float64
+	snowUntil          float64
+	snowPos            [2]float64
 }
 
 type Params struct {
@@ -152,6 +154,8 @@ type Params struct {
 	SpeedUp     bool
 	Backstab    float64
 	LethalK     float64
+	Hunt        bool
+	HuntFloor   float64
 }
 
 func DefaultParams() Params {
@@ -160,6 +164,7 @@ func DefaultParams() Params {
 		Peek: true, LaserFirst: false, CrowdHide: true, Practice: true}
 
 	p.LaserFirst = true
+	p.Hunt, p.HuntFloor = true, 0.28
 
 	return p
 }
@@ -316,6 +321,11 @@ func (b *Brain) observe(o *Obs) {
 			}
 		case "kill":
 			b.kills++
+			b.snowPos = [2]float64{me.Pos[0], me.Pos[1]}
+			if t := b.tracks[e.Target]; t != nil {
+				b.snowPos = [2]float64{t.Pos[0], t.Pos[1]}
+			}
+			b.snowUntil = now + 12
 			delete(b.tracks, e.Target)
 		}
 	}
@@ -332,7 +342,7 @@ func (b *Brain) observe(o *Obs) {
 	if b.otherDead >= 5 {
 		b.notPractice = true
 	}
-	if on := b.base.Practice && !b.notPractice && now > 20; on != b.pracOn {
+	if on := b.base.Practice && !b.notPractice && now > b.practiceAfter(); on != b.pracOn {
 		b.pracOn = on
 		b.P = b.base
 		if on {
@@ -560,6 +570,8 @@ func (b *Brain) step(o *Obs, act *Action) {
 			if b.P.Odds > 0 && !t.Engage && t.LOS && hpFrac > 0.5 && t.Dist < b.reach(me) && b.odds(me, t, now, true) >= b.P.Odds {
 				t.Engage = true
 			}
+		case b.P.Hunt && hpFrac > b.P.HuntFloor && t.Dist < maxT:
+			t.Engage = true
 		case b.P.AllFoes && t.Dist < maxT:
 			t.Engage = true
 		case t.Dist < b.P.EngageDist, now-t.HitMe < 6, late:
@@ -686,6 +698,23 @@ func (b *Brain) step(o *Obs, act *Action) {
 	zoneMust := !me.InZone || now+tNeed+3 >= deadline
 	zoneShould := now+tNeed+14 >= deadline
 
+	var chase *Track
+	if b.P.Hunt && foe == nil && hpFrac > b.P.HuntFloor+0.1 {
+		for _, t := range b.tracks {
+			age := now - t.Seen
+			if age <= 0 || age > 6 || t.HP > 1.5*me.HP {
+				continue
+			}
+			if chase == nil || (t.ID == b.stickID) || (chase.ID != b.stickID && t.Dist < chase.Dist) {
+				chase = t
+			}
+		}
+	}
+	snowX, snowY, snowing := 0.0, 0.0, false
+	if b.P.Hunt && now < b.snowUntil && hpFrac > b.P.HuntFloor && (target == nil || target.Dist > 35) {
+		snowX, snowY, snowing = b.snowGoal(me)
+	}
+
 	escJump := false
 	switch {
 	case b.escape(me, &mx, &my, &boost, &escJump):
@@ -732,6 +761,10 @@ func (b *Brain) step(o *Obs, act *Action) {
 		b.coverMove(o, seen, &mx, &my):
 		boost = me.Energy > 30 && (mx != 0 || my != 0)
 		mode = "evade"
+	case snowing:
+		mx, my = b.travel(me, snowX, snowY)
+		boost = me.Energy > 35 && (light == nil || me.Energy > 60)
+		mode = "snow"
 	case foe != nil:
 
 		ready := gun != nil && gun.Ammo > 0 && gun.Reload <= 0.25 && foe.Dist <= gun.Stats.Range-10
@@ -792,6 +825,11 @@ func (b *Brain) step(o *Obs, act *Action) {
 				mode = "fight:cube"
 			}
 		}
+	case chase != nil:
+		age := math.Min(now-chase.Seen, 3)
+		mx, my = b.travel(me, chase.Pos[0]+chase.Vel[0]*age, chase.Pos[1]+chase.Vel[1]*age)
+		boost = me.Energy > 60
+		mode = "chase"
 	case zoneShould && zdist > 2:
 		mx, my = b.travel(me, zgx, zgy)
 		mode = "zone"
@@ -1364,6 +1402,9 @@ func (b *Brain) prefRange(me *Self, t *Track) float64 {
 	}
 	if t.Kind == "npc" {
 		return 58
+	}
+	if b.P.Hunt && light != nil && me.Energy > 12 && holds(t.Weapons, "laser") {
+		r = 38
 	}
 	if light == nil {
 		if holds(t.Weapons, "lightning") {
@@ -1949,6 +1990,40 @@ func (b *Brain) odds(me *Self, t *Track, now float64, opening bool) float64 {
 	return 1 / (1 + math.Exp(-z))
 }
 
+func (b *Brain) practiceAfter() float64 {
+	if b.base.Hunt {
+		return 10
+	}
+	return 20
+}
+
+// snowGoal picks the nearest remembered cube near the last kill (or near me)
+// so the dropped cubes are collected immediately.
+func (b *Brain) snowGoal(me *Self) (float64, float64, bool) {
+	x, y := me.Pos[0], me.Pos[1]
+	bestD := math.Inf(1)
+	var bx, by float64
+	for _, c := range b.cubes {
+		if until, ok := b.bad[c.ID]; ok && until > b.now {
+			continue
+		}
+		if math.Abs(c.Pos[2]-me.Pos[2]) > 5 {
+			continue
+		}
+		d := hyp(c.Pos[0]-x, c.Pos[1]-y)
+		if d < 100 && (d < 45 || hyp(c.Pos[0]-b.snowPos[0], c.Pos[1]-b.snowPos[1]) < 40) && d < bestD {
+			bestD, bx, by = d, c.Pos[0], c.Pos[1]
+		}
+	}
+	if !math.IsInf(bestD, 1) {
+		return bx, by, true
+	}
+	if d := hyp(b.snowPos[0]-x, b.snowPos[1]-y); d > 6 && d < 120 && b.now < b.snowUntil-6 {
+		return b.snowPos[0], b.snowPos[1], true
+	}
+	return 0, 0, false
+}
+
 func squadParams(p Params) Params {
 	p.Ghost = false
 	p.Peek = false
@@ -1974,6 +2049,15 @@ func squadParams(p Params) Params {
 	p.HPw = 0.18
 	p.LethalK = 0.75
 
+	if p.Hunt {
+		p.CrowdHide = false
+		p.LoseRule = false
+		p.RetreatHP = p.HuntFloor
+		p.RecoverHP = 0.65
+		p.HPw = 0.3
+		p.Pursue = 2
+		p.OddsFlee = 0
+	}
 	return p
 }
 
