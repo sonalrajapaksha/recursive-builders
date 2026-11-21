@@ -272,3 +272,10 @@ if __name__ == "__main__":
                 print("FAIL", name, repr(e))
                 traceback.print_exc()
     sys.exit(1 if fails else 0)
+
+
+def test_sneak_when_looting_close():
+    o = base_obs()
+    o["pickups"] = [{"id": 7, "kind": "laser", "pos": [20.0, 0.0, 0.0]}]
+    a = mk().act(o)
+    assert math.hypot(*a["move"]) <= 0.45 and not a["boost"], a

@@ -123,6 +123,13 @@ class Policy:
         self.errs = 0
         self.mode = "init"
         self.nav_ok = nav is not None
+        self.step_speed = _num(_g(cfg, "sound", "step_speed"), 5.0)
+        self.cands = []        # hide candidates being scored: [(x, y)]
+        self.cand_best = None  # (score, x, y)
+        self.open_dir = None   # bearing of the most open approach from anchor
+        self.cover_key = None
+        self.cover_t = -99.0
+        self.cover_pt = None
 
     # ------------------------------------------------------------------ public
     def act(self, obs):
@@ -215,6 +222,82 @@ class Policy:
         if d <= radius:
             return [frm[0], frm[1]]
         return [center[0] + vx / d * radius, center[1] + vy / d * radius]
+
+    def _walkable(self, x, y, z):
+        try:
+            return not self.nav.blocked(x, y, z)
+        except Exception:
+            return True
+
+    def _cover_eval(self, x, y, z):
+        """(blocked fraction of 12 approach bearings at 70 m, mean open bearing) for a hide spot."""
+        eye = (x, y, z + 8.0)
+        nb, ox, oy = 0, 0.0, 0.0
+        for k in range(12):
+            a = k * TAU / 12
+            fx, fy = x + math.cos(a) * 70, y + math.sin(a) * 70
+            if self._los(eye, (fx, fy, z + 4.5)):
+                ox += math.cos(a)
+                oy += math.sin(a)
+            else:
+                nb += 1
+        return nb / 12.0, (math.atan2(oy, ox) if ox or oy else None)
+
+    def _hide_update(self, nc, nr, pos, key):
+        """Incrementally score hide spots inside the next circle (3 per tick); keep the best."""
+        if key != self.cover_key:
+            self.cover_key = key
+            rr = max(nr * 0.75 - 6.0, 3.0)
+            c = [(nc[0], nc[1])]
+            for fr in (0.4, 0.75, 1.0):
+                for k in range(8):
+                    a = k * TAU / 8 + fr
+                    c.append((nc[0] + math.cos(a) * rr * fr, nc[1] + math.sin(a) * rr * fr))
+            c.sort(key=lambda p: hyp(p[0] - pos[0], p[1] - pos[1]))
+            self.cands = c
+            self.cand_best = None
+        for _ in range(3):
+            if not self.cands:
+                break
+            x, y = self.cands.pop(0)
+            try:
+                z = self.nav.ground(x, y)
+            except Exception:
+                z = 0.0
+            if not self._walkable(x, y, z):
+                continue
+            cov, od = self._cover_eval(x, y, z)
+            sc = cov * 10.0 - 0.012 * hyp(x - pos[0], y - pos[1]) - 0.01 * hyp(x - nc[0], y - nc[1])
+            if self.cand_best is None or sc > self.cand_best[0]:
+                self.cand_best = (sc, x, y, od)
+
+    def _cover_from(self, pos, enemies, goal, t):
+        """Nearby walkable point that breaks line of sight to the closest enemies; cached 0.5 s."""
+        if t - self.cover_t < 0.5:
+            return self.cover_pt
+        self.cover_t = t
+        self.cover_pt = None
+        thr = [e for e in enemies[:2]]
+        if not thr or not self.nav_ok:
+            return None
+        best = None
+        for dist in (10.0, 22.0):
+            for k in range(8):
+                a = k * TAU / 8
+                x, y = pos[0] + math.cos(a) * dist, pos[1] + math.sin(a) * dist
+                try:
+                    z = self.nav.ground(x, y)
+                except Exception:
+                    continue
+                if not self._walkable(x, y, z):
+                    continue
+                if any(self._los((e["pos"][0], e["pos"][1], e["pos"][2] + 8.0), (x, y, z + 4.5)) for e in thr):
+                    continue
+                sc = dist + 0.15 * hyp(x - goal[0], y - goal[1]) - sum(0.1 * hyp(x - e["pos"][0], y - e["pos"][1]) for e in thr)
+                if best is None or sc < best[0]:
+                    best = (sc, (x, y))
+        self.cover_pt = best[1] if best else None
+        return self.cover_pt
 
     # ------------------------------------------------------------------ offers / loot values
     def _pick(self, offer, me):
@@ -353,9 +436,17 @@ class Policy:
 
         # anchor (hide point inside next circle, nearest to us)
         key = (round(nc[0]), round(nc[1]), round(nr))
-        if key != self.anchor_key or t - self.anchor_t > 3.0:
+        if key != self.anchor_key:
             self.anchor = self._safe_point(nc, max(nr * 0.55, 3.0), pos)
             self.anchor_key, self.anchor_t = key, t
+        if self.nav_ok and self.nav is not None:
+            try:
+                self._hide_update(nc, nr, pos, key)
+                if self.cand_best is not None:
+                    self.anchor = [self.cand_best[1], self.cand_best[2]]
+                    self.open_dir = self.cand_best[3]
+            except Exception:
+                pass
         anchor = self.anchor
 
         # ---- weapons
@@ -376,13 +467,10 @@ class Policy:
         flee = False
         if e0:
             ehp = _num(e0.get("hp"), mhp)
-            if n_close >= 3:
+            adv = n_close < 2 and hpf > 0.7 and ehp < 0.7 * hp
+            if n_close >= 2 or not adv:
                 flee = True
-            elif hpf < 0.35 and ehp > 0.5 * hp:
-                flee = True
-            elif hpf < 0.55 and ehp > 1.3 * hp:
-                flee = True
-        if flee and e0 and e0["_d"] < 22 and hpf > 0.2 and n_close < 3:
+        if flee and e0 and e0["_d"] < 25 and hpf > 0.2 and n_close < 3:
             flee = False  # cornered at melee range: fight back
 
         # ---- dodge (projectiles, charging lasers, incoming mortar)
@@ -402,20 +490,20 @@ class Policy:
                 tgt = min(pool, key=score)
             if tgt is not None:
                 ehp_f = _num(tgt.get("hp"), mhp) / max(_num(tgt.get("max_hp"), mhp), 1)
-                engaged = provoked or tgt["_d"] < 75 or (ehp_f < 0.4 and tgt["_d"] < 130) or bool(tgt.get("charging"))
+                engaged = provoked or tgt["_d"] < 40 or (ehp_f < 0.4 and tgt["_d"] < 130) or bool(tgt.get("charging"))
                 if engaged and (not flee or provoked):
                     target, ttype = tgt, "mech"
         farm_ok = (target is None and not flee and not zone_urgent and hpf > 0.6 and not vis)
         farm_target = None
         if farm_ok:
             for n in npcs:
-                if n["_d"] < 60:
+                if n["_d"] < 25:
                     farm_target = n
                     break
             if farm_target is None:
                 for c in obs.get("crates") or []:
                     cp = _vec(c.get("pos"))
-                    if cp and hyp(cp[0] - pos[0], cp[1] - pos[1]) < 45 and zone_ok(cp):
+                    if False and cp and zone_ok(cp):
                         farm_target = {"pos": cp, "vel": [0, 0, 0], "kind": "crate", "id": c.get("id"),
                                        "_d": hyp(cp[0] - pos[0], cp[1] - pos[1])}
                         break
@@ -456,7 +544,7 @@ class Policy:
                     continue
                 dxy = hyp(pp[0] - pos[0], pp[1] - pos[1])
                 dz = abs(pp[2] - pos[2])
-                if dz > 6 or dxy > 90 or not zone_ok(pp, 4.0):
+                if dz > 6 or dxy > 55 or not zone_ok(pp, 4.0):
                     continue
                 k = p["kind"]
                 v = self._weapon_value(k, t)
@@ -513,7 +601,11 @@ class Policy:
                 self.strafe_until = t + 1.2 + 0.8 * ((tick * 7919) % 10) / 10
             mx, my = unit(ax * 1.0 + gx * 0.35 + px * 0.35 * self.strafe, ay * 1.0 + gy * 0.35 + py * 0.35 * self.strafe)
             move_dir = (mx, my)
-            boost_pref = True
+            boost_pref = e0["_d"] < 60
+            cp_ = self._cover_from(pos, vis, anchor, t)
+            if cp_ is not None:
+                goal = cp_
+                move_dir = None
         elif target is not None and ttype in ("mech", "npc", "crate") and (engaged or farm_target is not None):
             mode = "fight" if ttype == "mech" else "farm"
             tp = _vec(target["pos"])
@@ -539,17 +631,17 @@ class Policy:
                 if drop[1]:
                     move_dir = (0.0, 0.0)
                     goal = None
-                boost_pref = drop[2]
+                boost_pref = False
             else:
                 cube = None
-                if safe_to_wander or (vis and e0["_d"] > 90 and hpf > 0.6):
+                if safe_to_wander:
                     best = 1e9
                     for c in obs.get("cubes") or []:
                         cp = _vec(c.get("pos"))
                         if not cp:
                             continue
                         dd = hyp(cp[0] - pos[0], cp[1] - pos[1])
-                        if dd < 55 and abs(cp[2] - pos[2]) < 7 and zone_ok(cp, 4.0) and dd < best:
+                        if dd < 30 and abs(cp[2] - pos[2]) < 7 and zone_ok(cp, 4.0) and dd < best:
                             best, cube = dd, cp
                 if cube is not None:
                     mode = "cube"
@@ -559,7 +651,7 @@ class Policy:
                     da = hyp(anchor[0] - pos[0], anchor[1] - pos[1])
                     if da > 12:
                         goal = (anchor[0], anchor[1])
-                        boost_pref = da > 90
+                        boost_pref = False
                     else:
                         goal = None
                         ax, ay = self.danger
@@ -578,8 +670,12 @@ class Policy:
         if goal is not None:
             mv, jump, steer_boost = self._steer(pos, goal, vel, tick)
             d_goal = hyp(goal[0] - pos[0], goal[1] - pos[1])
-            if d_goal > 80 and energy > 55 and mode in ("zone", "hide", "drop", "loot", "cube"):
+            if d_goal > 80 and energy > 55 and mode == "zone" and not (me.get("in_zone", True) and inside_now):
                 boost_pref = True
+            if mode in ("hide", "drop", "loot", "cube") and not zone_urgent and (
+                    d_goal < 60 or hyp(*self.danger) > 0.6) and not (phase_active and d_goal / max(walk, 1) > s_start - t + 20):
+                k = 0.9 * self.step_speed / max(walk, 1.0)   # below step_speed = silent (protocol §8)
+                mv = [mv[0] * min(1.0, k / max(hyp(*mv), 1e-6)), mv[1] * min(1.0, k / max(hyp(*mv), 1e-6))]
             if d_goal < 6:
                 s = d_goal / 6.0
                 mv = [mv[0] * max(s, 0.25), mv[1] * max(s, 0.25)]
@@ -620,6 +716,8 @@ class Policy:
         act["move"] = mv
         act["boost"] = boost
         act["jump"] = jump
+        if aim is None and mode == "hide" and self.open_dir is not None and hyp(*mv) < 0.5:
+            aim = [self.open_dir, 0.0]   # face the most open approach
         if aim is None:
             aim = [math.atan2(mv[1], mv[0]), 0.0] if hyp(*mv) > 0.2 else list(aim_now)
         act["aim"] = aim
@@ -660,12 +758,12 @@ class Policy:
                 continue
             if (max(dist - r, 0) / max(walk, 1.0)) > lands + 14:
                 continue
-            contested = [e for e in enemies if hyp(e["pos"][0] - dp[0], e["pos"][1] - dp[1]) < r + 20]
-            if contested and hpf < 0.7:
+            contested = [e for e in enemies if hyp(e["pos"][0] - dp[0], e["pos"][1] - dp[1]) < r + 60]
+            if contested or any(hyp(m["pos"][0] - dp[0], m["pos"][1] - dp[1]) < r + 60 for m in self.mem.values()):
                 continue
             holder = d.get("holder")
             me_id = _g(obs, "self", "id")
-            if holder is not None and holder != me_id and len(contested) > 0 and hpf < 0.9:
+            if holder is not None and holder != me_id:
                 continue
             if best is None or dist < best[0]:
                 inside = dist < r - 1.5 and lands <= 0
