@@ -31,4 +31,5 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 24 | 9f7a9107346d73aaf1920f197cc158fbf535474b (tv-maxt320) | docker PASS | scored, receipt BB-F2B36F1E | 6.10 (no effect) |
 | 25 | 52d923ed83c9ca54ecca81b296656716a1c4d647 (mpc-combat: sampling MPC dodge/combat movement in squad profile) | docker PASS p99 5.5ms | scored, receipt BB-01F713E5 | 5.15 (-0.95 vs base; guessed model hurts; dropped) |
 | 26 | da818512377cca91eeb59f4966f01dae79d091ec (mpc-combat-lite: MPC only on laser/bullet triggers) | docker PASS | scored, receipt BB-6742FA62 | 5.35 (-0.75 vs base; dropped) |
-| 27 | cbc30a1fb24587ee19ba0854d71a7d69b3265d7d (wpn-ambush: hidden pre-charged laser ambush) | docker PASS | received, scoring | pending |
+| 27 | cbc30a1fb24587ee19ba0854d71a7d69b3265d7d (wpn-ambush: hidden pre-charged laser ambush) | docker PASS | scored, receipt BB-02808AD2 | 5.85 (-0.25 vs base; dropped) |
+| 28 | f1999a24f30ecc0977419c61490c706412d4284a (wpn-lightning-counter) | docker PASS | received, receipt BB-4F4F4384-ish, scoring | pending |
