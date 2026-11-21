@@ -14,3 +14,4 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E10 | official aggressor2 (a6eb860): faster/wider loot, cubes, drops | 4.31 vs 4.25 (within noise, still best). Gap to top-20 (~5.1): ~0.8 |
 | E11 | combo1 (24f35d6) = aggressor2 + fight-quality; docker amd64 check PASS p99 5.5ms | submit when quota frees (next slot 4:51 AM EST) |
 | E12 | aggressor3 (62e1234) = aggressor2 + early zone exit in late phases + chase weak mechs; docker check PASS | queued after combo1 |
+| E13 | analysis (rules) | Practice = us vs 15 house bots that never fight each other => place ~= 16 - (#bots dead before us). Kills (and zone) are the only way to climb. Duel strength + gear/cube snowball is THE lever. Site gives no replays/per-match data (checked submission rows + status page). |
