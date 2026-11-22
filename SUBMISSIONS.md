@@ -75,4 +75,4 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 68 | 25dcf3677b06351c09f18a53c7764fe2a1f75b6b (automata-base RESUBMITTED, identical commit, variance test) | docker PASS | scored on builders-4, receipt BB-70F341B1 | 6.16 (identical to BB-B33647E6: scorer is deterministic) |
 | 69 | 89c7522a1a531391b2955dfd75f6942ada19e824 (ar-all: automata-base + 3 audit fixes) | docker PASS | scored on builders-4, receipt BB-7BC7C86A | 5.84 (-0.32 vs automata-base 6.16) |
 | 70 | 8773793dfd2294f1c8ba12833d99052a3450369c (apex-v3: Ahmad Suliman's Apex-Go v3 @ 56e0f76, MIT, vendored unmodified, credit kept) | docker PASS p99 2.1 ms | scored on builders-4, receipt BB-606E0124 | 6.19 (about equal to automata-base 6.16; leaderboard score now 6.19) |
-| 71 | 121b6c574528698d0a765d3ea04df28f70648dc3 (apex-head: Apex-Go @ f29e4d3, MIT, vendored unmodified) | docker PASS p99 3.0 ms | submitted, receipt BB-FC264CAA, awaiting score | pending |
+| 71 | 121b6c574528698d0a765d3ea04df28f70648dc3 (apex-head: Apex-Go @ f29e4d3, MIT, vendored unmodified) | docker PASS p99 3.0 ms | scored on builders-4, receipt BB-FC264CAA | 4.48 (much worse; do not use) |
