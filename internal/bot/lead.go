@@ -124,3 +124,31 @@ func (b *Bot) gunLead(tr *Track) float64 {
 	}
 	return b.leadPersistAt(tr, b.t)
 }
+
+// updateAccel estimates horizontal acceleration before the new velocity replaces the old one.
+func (tr *Track) updateAccel(vel [3]float64, dt float64) {
+	if !tr.WasListed || dt > 0.25 {
+		tr.accel = [2]float64{}
+		return
+	}
+	if dt <= 0 {
+		return
+	}
+	ax, ay := (vel[0]-tr.Vel[0])/dt, (vel[1]-tr.Vel[1])/dt
+	if mag := hyp(ax, ay); mag > 60 {
+		ax, ay = ax*(60/mag), ay*(60/mag)
+	}
+	weight := dt / (0.15 + dt)
+	tr.accel[0] += weight * (ax - tr.accel[0])
+	tr.accel[1] += weight * (ay - tr.accel[1])
+}
+
+// accelCorrection bounds both the prediction horizon and the extra displacement.
+func accelCorrection(accel [2]float64, flight float64) (x, y float64) {
+	t := math.Min(flight, 0.35)
+	x, y = accel[0]*0.5*t*t, accel[1]*0.5*t*t
+	if mag := hyp(x, y); mag > 2.5 {
+		x, y = x*(2.5/mag), y*(2.5/mag)
+	}
+	return x, y
+}
