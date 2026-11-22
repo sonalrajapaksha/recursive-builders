@@ -68,4 +68,4 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 61 | dd3731aeb47fa01437d490bb720635bf7efbcb77 (dr-hyst, resubmitted on the new 96-seed scorer) | docker PASS | scored on builders-4, receipt BB-F8B41B8E | 5.42 (below dronestrict 5.60) |
 | 62 | 863fa4e85d7fefb93fec4d0bbaaa8a4b61cad967 (tv-dv600, no drone laser, on builders-4) | docker PASS | scored on builders-4, receipt BB-77CEA322 | 5.33 (below dronestrict 5.60: drone laser helps ~+0.27) |
 | 63 | waiprotein/mech-royale-bot 42c594fc51f2fecd457c984cb18f0ede9d3cf306 (third-party MIT giddy fork, reference only, builders-4) | not ours | scored on builders-4, receipt BB-E03246D7 | 5.40 (reference; no better than ours) |
-| 64 | 25dcf3677b06351c09f18a53c7764fe2a1f75b6b (automata-base: vendored jason-scheffel/automata 91f7132, MIT, BOT_NAME=recursive) | docker PASS | submitted, receipt BB-B33647E6, awaiting score | pending |
+| 64 | 25dcf3677b06351c09f18a53c7764fe2a1f75b6b (automata-base: vendored jason-scheffel/automata 91f7132, MIT, BOT_NAME=recursive) | docker PASS | scored on builders-4, receipt BB-B33647E6 | **6.16 (+0.56 vs tv-dronestrict 5.60): NEW BEST on the new scorer** |
