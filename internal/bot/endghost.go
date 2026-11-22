@@ -10,7 +10,7 @@ func (b *Bot) endGhostActive(zi zoneInfo) bool {
 	r := b.o.Zone.NextRadius
 	return b.P.EndGhost && b.P.PracticeAware && !b.ffa &&
 		(b.st.name == "squad" || b.st.name == "late") &&
-		r > 0 && r <= 140 && !zi.urgent && !zi.critical
+		r > 0 && r <= b.P.EndGhostRadius && !zi.urgent && !zi.critical
 }
 
 // endGhostStep walks to a sheltered part of the next circle and holds there.
