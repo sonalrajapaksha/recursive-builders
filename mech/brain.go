@@ -160,7 +160,7 @@ type Params struct {
 func DefaultParams() Params {
 	p := Params{RetreatHP: 0.38, RecoverHP: 0.8, GunRange: 85, LightRange: 28, LaserRange: 85, EngageDist: 60, FarmNPC: true, Explore: false,
 		Ghost: true, HomeExpo: 120, LootRadius: 90, CrateUntil: 150, UseDrops: true, Dodge: true, NoMortar: true,
-		Peek: true, LaserFirst: false, CrowdHide: true, Practice: true, DropV1: 170, DropV2: 260, DropWin: 25}
+		Peek: true, LaserFirst: false, CrowdHide: true, Practice: false, DropV1: 450, DropV2: 600, DropWin: 40}
 
 	p.LaserFirst = true
 
