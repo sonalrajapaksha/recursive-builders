@@ -96,7 +96,6 @@ type Brain struct {
 	otherDead          int
 	maxUnexpl          int
 	ffaOn              bool
-	exch               map[int]*exchange
 	stickID            int
 	stickAt, loseAt    float64
 }
@@ -165,14 +164,10 @@ type Params struct {
 	// FFA-only knobs (0 = off). They are 0 in DefaultParams and in squadParams; only ffaParams sets them, and
 	// only after the bot has proven it is in a free-for-all (see ffaProven). Ported, with credit, from
 	// waiprotein/mech-royale-bot (MIT, https://github.com/waiprotein/mech-royale-bot, commit 42c594f):
-	// LateR: next-circle radius at or below which the end game starts (no retreat, engage all); 0 = 70.
 	// HoldOut / HoldMin: until match time HoldOut, once the next circle is the final one (<= 30 m), a ghost
 	// waits at a hidden spot HoldMin..HoldMin+25 m from the final centre instead of walking into the pile-up.
-	// DuelFlee: flee (OddsFlee plumbing) when duelOdds for the current target is below this.
-	LateR    float64
-	HoldOut  float64
-	HoldMin  float64
-	DuelFlee float64
+	HoldOut float64
+	HoldMin float64
 }
 
 // ffaStrictN is how many deaths we did not cause must have happened before the FFA profile switches on. The
@@ -183,7 +178,7 @@ const ffaStrictN = 2
 
 // ffaProfile is applied once, on top of the base (ghost) params, when ffaProven first holds.
 var ffaProfile = func(p Params) Params {
-	p.LateR, p.HoldOut, p.HoldMin = 25, 368, 60
+	p.HoldOut, p.HoldMin = 368, 60
 	return p
 }
 
@@ -350,12 +345,6 @@ func (b *Brain) observe(o *Obs) {
 		case "kill":
 			b.kills++
 			delete(b.tracks, e.Target)
-		}
-		switch {
-		case e.Type == "hit":
-			b.noteExchange(e.Target, true, now)
-		case e.Type == "damaged" && e.By != nil:
-			b.noteExchange(*e.By, false, now)
 		}
 	}
 
@@ -557,11 +546,7 @@ func (b *Brain) step(o *Obs, act *Action) {
 	_, gun := hasWeapon(me.Weapons, "gun")
 	_, light := hasWeapon(me.Weapons, "lightning")
 	_, laser := hasWeapon(me.Weapons, "laser")
-	lateR := 70.0
-	if b.P.LateR > 0 {
-		lateR = b.P.LateR
-	}
-	late := z.NextRadius <= lateR || o.Alive <= 3
+	late := z.NextRadius <= 70 || o.Alive <= 3
 
 	var seen []*Track
 	var target, hidden, shy *Track
@@ -677,9 +662,6 @@ func (b *Brain) step(o *Obs, act *Action) {
 	outgunned := target != nil && holds(target.Weapons, "laser") && myLaser == nil && target.Dist > 55 && hpFrac < 0.8
 	swamped := b.P.CrowdHide && (crowd >= 3 || (crowd == 2 && hpFrac < 0.65) || outgunned)
 	if b.P.OddsFlee > 0 && target != nil && !finishing && b.odds(me, target, now, false) < b.P.OddsFlee {
-		b.oddsFleeUntil = now + 5
-	}
-	if b.P.DuelFlee > 0 && target != nil && !finishing && b.duelOdds(me, target) < b.P.DuelFlee {
 		b.oddsFleeUntil = now + 5
 	}
 	if now < b.oddsFleeUntil && !finishing {

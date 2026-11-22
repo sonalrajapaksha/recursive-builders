@@ -7,8 +7,8 @@ import (
 
 func noFFA(t *testing.T, where string, p Params) {
 	t.Helper()
-	if p.LateR != 0 || p.HoldOut != 0 || p.HoldMin != 0 || p.DuelFlee != 0 {
-		t.Fatalf("%s: FFA knobs must be off, got LateR=%v HoldOut=%v HoldMin=%v DuelFlee=%v", where, p.LateR, p.HoldOut, p.HoldMin, p.DuelFlee)
+	if p.HoldOut != 0 || p.HoldMin != 0 {
+		t.Fatalf("%s: FFA knobs must be off, got HoldOut=%v HoldMin=%v", where, p.HoldOut, p.HoldMin)
 	}
 }
 
@@ -56,7 +56,7 @@ func TestFFAGateOffInPractice(t *testing.T) {
 
 	alive-- // a second death we did not cause: proven free-for-all
 	feed(b, 120, 121, alive, nil)
-	if !b.ffaOn || b.P.HoldOut == 0 || b.P.LateR == 0 {
+	if !b.ffaOn || b.P.HoldOut == 0 {
 		t.Fatal("two unexplained deaths should switch the FFA profile on")
 	}
 }

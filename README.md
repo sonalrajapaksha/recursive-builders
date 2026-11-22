@@ -65,7 +65,6 @@ Build: `docker build --platform linux/amd64 -t rb-bot .`; check per protocol.md 
 This branch runs the MIT-licensed Go bot from https://github.com/justnau/giddygiddyboy-mech-royale @ edbdb6b (cmd/, mech/, go.mod, Dockerfile unchanged). License: LICENSE-giddygiddyboy. Our own improvements are layered on top in later commits.
 
 ## FFA profile (ffa-* branches)
-`mech/ffa.go` ports the end-game hold-out (`holdingOut`, `holdHome`, `LateR`/`HoldOut`/`HoldMin`) and the duel model
-(`duelOdds`, `DuelFlee`) from https://github.com/waiprotein/mech-royale-bot @ 42c594f (MIT, LICENSE-waiprotein).
+`mech/ffa.go` ports the end-game hold-out (`holdingOut`, `holdHome`, `HoldOut`/`HoldMin`) from https://github.com/waiprotein/mech-royale-bot @ 42c594f (MIT, LICENSE-waiprotein).
 All of it is off in DefaultParams and squadParams and is applied once, by `ffaProfile`, only after two deaths we did
 not cause (`ffaProven`, waiprotein's FFAStrictN = 2). Practice play is unchanged (TestFFAGateOffInPractice).
