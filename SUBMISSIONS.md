@@ -53,3 +53,4 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 46 | 16e14ea95145424f29735e7753bc712a94d7a239 (tv-s2: Salt 2) | docker PASS | scored, receipt BB-9CE0F27F | 5.54 (salt draw) |
 | 47 | 40a1791d9b144a1937c9e0696cab7db96f9638f8 (tv-s3: Salt 3) | docker PASS | scored, receipt BB-27D6721D | 5.38 (salt draw) |
 | 48 | 477ce204451a51325467150b8cfcdc1fcd6cb673 (dv600-roof: rooftop fortress, Roof=1) | docker PASS | scored, receipt BB-521E15CE | 4.69 (-1.56 vs dv600; FALSIFIED) |
+| 49 | 2cd669ff2155b19b7d20f810edd174663149e680 (dv600-roof-lite: Roof=2, climbs only after contact) | docker PASS | submitted, receipt BB-1CE6B233, awaiting score | pending |
