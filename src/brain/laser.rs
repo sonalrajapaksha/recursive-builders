@@ -48,11 +48,22 @@ impl Brain {
         obs.me.weapons.iter().position(|w| w.as_ref().map_or(false, |w| w.kind == WeaponKind::Laser))
     }
 
+    fn capturing_drop(&self, obs: &Obs) -> bool {
+        if !self.p.keep_drop_capture || self.mode != Mode::Drop {
+            return false;
+        }
+        let Goal::Nav { pos, .. } = self.goal else { return false };
+        obs.drops.iter().any(|d| {
+            d.pos == pos && d.lands_in <= 0.0 && d.holder == Some(obs.me.id)
+                && d.progress > 0.0 && dist2(obs.me.pos, d.pos) < d.radius
+        })
+    }
+
     pub(crate) fn laser_pre(&mut self, obs: &Obs, world: &World, nav: &Nav) {
         let p = self.p.clone();
         let t = obs.t;
         let pos = obs.me.pos;
-        if p.lz_seek > 0.0 && self.laser_slot(obs).is_none() && !matches!(self.mode, Mode::Zone) && !self.dq_busy() && (self.mode != Mode::Retreat || p.lz_seek_retreat > 0.5) {
+        if p.lz_seek > 0.0 && self.laser_slot(obs).is_none() && !matches!(self.mode, Mode::Zone) && !self.dq_busy() && !self.capturing_drop(obs) && (self.mode != Mode::Retreat || p.lz_seek_retreat > 0.5) {
             if self.want(&obs.me, WeaponKind::Laser).is_some() {
                 let z = &obs.zone;
                 let hot = t - self.mem.last_damage_t < p.lz_hot_s || self.mem.tracks.iter().any(|tr| tr.kind == ActorKind::Mech && t - tr.last_seen < p.lz_hot_s && dist(tr.pos_at(t), pos) < p.lz_hot_d);
@@ -530,5 +541,41 @@ impl Brain {
             mv.boost = me.energy > 8.0;
             mv.jump = false;
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::brain::params::Params;
+    use crate::proto::Hello;
+    use crate::Shared;
+    use std::sync::Arc;
+
+    #[test]
+    fn laser_seek_preserves_current_drop_capture_when_enabled() {
+        let hello = Hello::default();
+        let world = World::empty();
+        let nav = Nav::build(&world, &hello.config.mech);
+        let shared = Arc::new(Shared { world, nav });
+        let mut brain = Brain::with_params(&hello, shared.clone(), Params {
+            lz_seek: 300.0, keep_drop_capture: true, ..Params::default()
+        });
+        let obs: Obs = serde_json::from_str(r#"{
+            "t":96,"self":{"id":1},
+            "zone":{"radius":200},
+            "drops":[{"pos":[0,0,0],"radius":8,"holder":1,"progress":1}],
+            "pickups":[{"id":8000,"kind":"laser","pos":[25,0,0]}]
+        }"#).unwrap();
+        brain.mem.update(&obs, &shared.world, &hello.config);
+        brain.mode = Mode::Drop;
+        brain.goal = Goal::Nav { pos: [0.0; 3], arrive: 2.4 };
+        brain.laser_pre(&obs, &shared.world, &shared.nav);
+        assert_eq!(brain.mode, Mode::Drop);
+
+        Arc::make_mut(&mut brain.p).keep_drop_capture = false;
+        brain.laser_pre(&obs, &shared.world, &shared.nav);
+        assert_eq!(brain.mode, Mode::Loot);
+        assert_eq!(brain.goal_id, 8000);
     }
 }
