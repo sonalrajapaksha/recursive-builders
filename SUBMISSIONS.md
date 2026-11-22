@@ -84,4 +84,4 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 77 | b079d4450d8d35425e82f25e5e9b878307a60be6 (ap-accellead-on: Apex-Go v3 + independently implemented capped acceleration lead, AccelLead default true; docker PASS p99 2.6 ms) | docker PASS | scored on builders-4, receipt BB-6B1B1241 | 6.06 |
 | 78 | cd655761fb76e3de5d7852ff95cf6817ab37d919 (ap-combo3: Apex v3 + CoverHeal + EndGhost + AccelLead on; docker PASS p99 4.9 ms) | docker PASS | scored on builders-4, receipt BB-2A4D8748 | **6.35 (new best; entered as final pick)** |
 | 79 | a530f940e7196a6857711f0028b77dcc53a06f31 (ap-ch-lo: CoverHeal 50%/85%; docker PASS p99 2.5 ms) | docker PASS | scored on builders-4, receipt BB-AC6688A1 | 6.32 (just below combo3 6.35) |
-| 80 | 790b00c37c0390c64709ac57fcf32469078d9e1f (ap-combo-ca: CoverHeal + AccelLead on) | docker PASS | submitted, receipt BB-006A0E18, awaiting score | pending |
+| 80 | 790b00c37c0390c64709ac57fcf32469078d9e1f (ap-combo-ca: CoverHeal + AccelLead on) | docker PASS | scored on builders-4, receipt BB-006A0E18 | 6.20 |
