@@ -65,3 +65,4 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E61 | official tv-dv1000 (318edef) = 6.23, below dv600 6.25: stronger priority does not help; 6.25 stays best. Submitted tv-dv600w80. |
 | E62 | official tv-dv600w80 (cc3bb52) = 6.25, ties dv600 (window 40 vs 80 no difference). Pick stays dv600. Next: stack untested knobs FarmHP 0.35 and LootRadius 220 on the dv600 drop settings. |
 | E63 | built tv-dfarm35 9b7d6fd and tv-dloot220 cbaaf04 (dv600 drops + one knob each). Submitted dfarm35; dloot220 next. |
+| E64 | official tv-dfarm35 (9b7d6fd) = 6.25, FarmHP has no effect. Submitted waiprotein/mech-royale-bot 42c594f as a reference measurement at the user request (MIT fork; not our code). tv-dloot220 cbaaf04 still queued. |
