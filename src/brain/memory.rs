@@ -307,6 +307,24 @@ impl Memory {
         }
     }
 
+    pub fn forget_missing_npcs(&mut self, obs: &Obs, world: &World, cfg: &Config) {
+        let eye = up(obs.me.pos, obs.me.stats.eye_height);
+        let near = cfg.vision.near_range + obs.me.stats.near_range_bonus;
+        self.tracks.retain(|tr| {
+            let age = obs.t - tr.last_seen;
+            if tr.kind != ActorKind::Npc || !(age > 0.0 && age <= 0.25) {
+                return true;
+            }
+            // Only forget a missing drone while well inside proximity range
+            // and with a clear view of its last and extrapolated positions.
+            let last = up(tr.pos, cfg.npc.height * 0.5);
+            let predicted = up(tr.pos_at(obs.t), cfg.npc.height * 0.5);
+            !(dist(eye, last).max(dist(eye, predicted)) + 5.0 < near
+                && world.sight(eye, last)
+                && world.sight(eye, predicted))
+        });
+    }
+
     /// Displacement over the last w seconds, or None when history is shorter.
     pub fn moved(&self, t: f64, w: f64) -> Option<f64> {
         let first = self.hist.front()?;
@@ -316,5 +334,29 @@ impl Memory {
         let old = self.hist.iter().find(|h| t - h.0 <= w)?;
         let cur = self.hist.back()?;
         Some(dist(old.1, cur.1))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn forgets_only_recent_missing_npcs_in_clear_proximity() {
+        let world = World::empty();
+        let cfg = Config::default();
+        let mut obs: Obs = serde_json::from_str(r#"{"t":1,"mechs":[
+            {"id":100,"kind":"npc","pos":[10,0,0]},
+            {"id":101,"kind":"npc","pos":[75,0,0]},
+            {"id":102,"kind":"npc","pos":[15,0,0]},
+            {"id":2,"kind":"mech","pos":[10,0,0]}
+        ]}"#).unwrap();
+        let mut mem = Memory::new();
+        mem.update(&obs, &world, &cfg);
+        obs.t += 0.1;
+        obs.mechs.retain(|a| a.id == 102);
+        mem.update(&obs, &world, &cfg);
+        mem.forget_missing_npcs(&obs, &world, &cfg);
+        assert_eq!(mem.tracks.iter().map(|tr| tr.id).collect::<Vec<_>>(), [2, 101, 102]);
     }
 }
