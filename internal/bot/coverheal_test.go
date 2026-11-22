@@ -8,8 +8,9 @@ import (
 
 func TestCoverHealGate(t *testing.T) {
 	b := Bot{P: DefaultParams(), hp: 590, maxHP: 1000}
+	b.P.CoverHeal = false
 	if b.coverHealActive(zoneInfo{}, 81) {
-		t.Fatal("default parameters enabled CoverHeal")
+		t.Fatal("disabled CoverHeal gate activated")
 	}
 	b.P.CoverHeal = true
 	if b.coverHealActive(zoneInfo{}, 80) || b.coverHealActive(zoneInfo{urgent: true}, 81) {

@@ -9,8 +9,9 @@ import (
 func TestEndGhostGate(t *testing.T) {
 	b := Bot{P: DefaultParams(), o: &proto.Obs{}, st: stance{name: "squad"}}
 	b.o.Zone.NextRadius = 140
+	b.P.EndGhost = false
 	if b.endGhostActive(zoneInfo{}) {
-		t.Fatal("default parameters enabled EndGhost")
+		t.Fatal("disabled EndGhost gate activated")
 	}
 	b.P.EndGhost = true
 	if !b.endGhostActive(zoneInfo{}) || b.endGhostActive(zoneInfo{urgent: true}) {

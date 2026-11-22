@@ -17,22 +17,24 @@ import (
 type Params struct {
 	Name string
 
-	EngageRatio   float64 // start a fight when our advantage ratio is at least this
-	DisengageRat  float64 // retreat when the ratio falls below this
-	RetreatHP     float64 // retreat to cover below this HP fraction when someone can hurt us
-	CoverHeal     bool    // seek shelter for regeneration before being forced to retreat
-	ReturnHP      float64 // come back out above this HP fraction
-	AccelLead     bool    // add capped acceleration correction to gun lead
-	LeadDamp      float64 // how much of a target's velocity to trust for long flight times
-	GunMaxRange   float64 // never fire the gun at mechs beyond this
-	StrafeMin     float64 // seconds between strafe direction changes (min)
-	StrafeMax     float64
-	LootRadius    float64 // how far we go for loot
-	WantCubes     int     // stop seeking cubes beyond this
-	DropGreed     float64 // 0..1 willingness to contest supply drops
-	Hunt          bool    // chase weaker enemies that are not looking at us
-	EndGhost      bool    // hold cover in late practice circles
-	PracticeAware bool    // adapt when the lobby looks like the cooperating house squad
+	EngageRatio    float64 // start a fight when our advantage ratio is at least this
+	DisengageRat   float64 // retreat when the ratio falls below this
+	RetreatHP      float64 // retreat to cover below this HP fraction when someone can hurt us
+	CoverHeal      bool    // seek shelter for regeneration before being forced to retreat
+	CoverHealStart float64 // health fraction below which cover healing starts
+	CoverHealClear float64 // health fraction at which cover healing ends
+	ReturnHP       float64 // come back out above this HP fraction
+	AccelLead      bool    // add capped acceleration correction to gun lead
+	LeadDamp       float64 // how much of a target's velocity to trust for long flight times
+	GunMaxRange    float64 // never fire the gun at mechs beyond this
+	StrafeMin      float64 // seconds between strafe direction changes (min)
+	StrafeMax      float64
+	LootRadius     float64 // how far we go for loot
+	WantCubes      int     // stop seeking cubes beyond this
+	DropGreed      float64 // 0..1 willingness to contest supply drops
+	Hunt           bool    // chase weaker enemies that are not looking at us
+	EndGhost       bool    // hold cover in late practice circles
+	PracticeAware  bool    // adapt when the lobby looks like the cooperating house squad
 
 	// free-for-all stance (used once we see mechs dying that we did not kill)
 	FFAEngage      float64
@@ -180,22 +182,26 @@ type Params struct {
 
 func DefaultParams() Params {
 	return Params{
-		CoverHeal:     true,
-		Name:          "apex-go",
-		EngageRatio:   1.25,
-		DisengageRat:  0.75,
-		RetreatHP:     0.45,
-		ReturnHP:      0.85,
-		LeadDamp:      0.65,
-		GunMaxRange:   224,
-		StrafeMin:     0.35,
-		StrafeMax:     1.1,
-		LootRadius:    220,
-		WantCubes:     15,
-		DropGreed:     0.5,
-		Hunt:          true,
-		PracticeAware: true,
-		Salt:          8,
+		CoverHeal:      true,
+		CoverHealStart: 0.60,
+		CoverHealClear: 0.90,
+		EndGhost:       true,
+		AccelLead:      true,
+		Name:           "apex-go",
+		EngageRatio:    1.25,
+		DisengageRat:   0.75,
+		RetreatHP:      0.45,
+		ReturnHP:       0.85,
+		LeadDamp:       0.65,
+		GunMaxRange:    224,
+		StrafeMin:      0.35,
+		StrafeMax:      1.1,
+		LootRadius:     220,
+		WantCubes:      15,
+		DropGreed:      0.5,
+		Hunt:           true,
+		PracticeAware:  true,
+		Salt:           8,
 		// SlotRule stays off: the track page says the practice slot varies each match
 		FFAEngage:         1.8,
 		FFADisengage:      0.95,
