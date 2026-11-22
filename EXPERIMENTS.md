@@ -118,3 +118,4 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E114 | official ds2-farm (59d4e75) = 6.06, -0.29: wider farm reach hurts even when gated (like LootRadius 220 = 6.06). Reach/farming expansion closed. Remaining: strict3, ds2-dropgate. |
 | E115 | submitted tv-dronestrict3 (BB-E9CEBCEA). Remaining after it: ds2-dropgate ac58e6c. |
 | E116 | official tv-dronestrict3 (590d913) = 6.35, ties dronestrict: quiet radius 110 vs 160 does not matter. Submitted ds2-dropgate (BB-1E2F544A), the last queued branch. After it the harvest-extension family is exhausted: only the strict drone laser (6.35) helped; crate-laser 6.02, wpn 6.27, farm 6.06. |
+| E117 | official ds2-dropgate (ac58e6c) = 6.15, -0.20: gating drop capture on more quiet skips proven captures. Harvest-extension family closed. Best = tv-dronestrict 5397bc5af0ce 6.35 (also tv-dronestrict3 6.35); final pick = BB-C97BAD66 (set by user). Queue empty; no workers running. |
