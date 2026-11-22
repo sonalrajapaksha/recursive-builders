@@ -17,3 +17,17 @@ func (b *Brain) droneLaserOK(farm *Track, seen []*Track, hpFrac, dist float64) b
 	}
 	return true
 }
+
+// crateLaserOK lets the laser open a crate (300 HP, one 315-dmg shot) under the same
+// strict safety gates as droneLaserOK.
+func (b *Brain) crateLaserOK(farm *Track, farmPos *Vec3, seen []*Track, hpFrac, dist float64) bool {
+	if !b.P.CrateLaser || farm != nil || farmPos == nil || hpFrac < b.P.DroneHP || dist > b.P.DroneRange {
+		return false
+	}
+	for _, t := range seen {
+		if b.now-t.Seen < 1.5 && t.Dist < b.P.DroneQuiet {
+			return false
+		}
+	}
+	return true
+}

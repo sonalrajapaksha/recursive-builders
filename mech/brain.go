@@ -159,6 +159,7 @@ type Params struct {
 	DroneRange  float64
 	DroneHP     float64
 	DroneQuiet  float64
+	CrateLaser  bool
 }
 
 func DefaultParams() Params {
@@ -1002,7 +1003,7 @@ func (b *Brain) step(o *Obs, act *Action) {
 					act.Fire[i] = true
 				}
 			case "laser":
-				droneOK := !isMech && b.droneLaserOK(farm, seen, hpFrac, dist)
+				droneOK := !isMech && (b.droneLaserOK(farm, seen, hpFrac, dist) || b.crateLaserOK(farm, farmPos, seen, hpFrac, dist))
 				if (!isMech && !droneOK) || dist > w.Stats.Range*0.97 {
 					break
 				}
