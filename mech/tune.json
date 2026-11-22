@@ -1,1 +1,1 @@
-{"DropV2":600,"DropV1":450,"DropWin":40,"DroneLaser":1,"DroneRange":55,"DroneHP":0.75,"DroneQuiet":110}
+{"DropV2":600,"DropV1":450,"DropWin":40,"DroneLaser":1,"DroneRange":55,"DroneHP":0.75,"DroneQuiet":110,"DroneHyst":10}
