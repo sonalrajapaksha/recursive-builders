@@ -159,6 +159,7 @@ type Params struct {
 	DroneRange  float64
 	DroneHP     float64
 	DroneQuiet  float64
+	DroneGhost  bool
 }
 
 func DefaultParams() Params {
@@ -275,7 +276,7 @@ func (b *Brain) observe(o *Obs) {
 		}
 	}
 	for id, t := range b.npcs {
-		if now-t.Seen > 120 {
+		if now-t.Seen > 120 || (b.P.DroneGhost && b.npcGone(t, me, eye, now)) {
 			delete(b.npcs, id)
 		}
 	}
