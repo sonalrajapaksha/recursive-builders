@@ -71,4 +71,5 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 64 | 25dcf3677b06351c09f18a53c7764fe2a1f75b6b (automata-base: vendored jason-scheffel/automata 91f7132, MIT, BOT_NAME=recursive) | docker PASS | scored on builders-4, receipt BB-B33647E6 | **6.16 (+0.56 vs tv-dronestrict 5.60): NEW BEST on the new scorer** |
 | 65 | 54b67b2a872e3fcc2d7b434e638d7fb4993c5a0e (av-lz260: automata-base with lz_seek 260) | docker PASS | scored on builders-4, receipt BB-E7F893EC | 5.91 (-0.25 vs automata-base 6.16) |
 | 66 | 5ad09e9aaa5d74e8003d68826136c227dd5018be (av-pur10: gear_pursuit_s 10) | docker PASS | scored on builders-4, receipt BB-8C5FA444 | 5.82 (-0.34 vs automata-base) |
-| 67 | 2c900b1821ba0750c0f7f4e03cf2620097ec83ef (av-harv60: harvest_site_s 60) | docker PASS | submitted, receipt BB-36F1F8F1, awaiting score | pending |
+| 67 | 2c900b1821ba0750c0f7f4e03cf2620097ec83ef (av-harv60: harvest_site_s 60) | docker PASS | scored on builders-4, receipt BB-36F1F8F1 | 5.77 (-0.39 vs automata-base) |
+| 68 | 25dcf3677b06351c09f18a53c7764fe2a1f75b6b (automata-base RESUBMITTED, identical commit, variance test) | docker PASS | submitted, receipt BB-70F341B1, awaiting score | pending |
