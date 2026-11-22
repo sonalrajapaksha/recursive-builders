@@ -41,6 +41,9 @@ pub(crate) struct Fz4 {
 static T0: std::sync::OnceLock<f64> = std::sync::OnceLock::new();
 
 pub(crate) fn open_gate(p: &super::Params) -> bool {
+    if p.fz4_o_disable {
+        return false;
+    }
     if p.fz4_o_from <= 0.0 {
         return true;
     }
