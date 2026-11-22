@@ -20,6 +20,7 @@ type Params struct {
 	EngageRatio   float64 // start a fight when our advantage ratio is at least this
 	DisengageRat  float64 // retreat when the ratio falls below this
 	RetreatHP     float64 // retreat to cover below this HP fraction when someone can hurt us
+	CoverHeal     bool // seek shelter for regeneration before being forced to retreat
 	ReturnHP      float64 // come back out above this HP fraction
 	LeadDamp      float64 // how much of a target's velocity to trust for long flight times
 	GunMaxRange   float64 // never fire the gun at mechs beyond this
@@ -458,7 +459,10 @@ type Bot struct {
 	mode       string
 	targetID   int
 	retreating bool
-	coverCell  int
+	coverHealOn bool
+	coverHealCell int
+	coverHealRetry float64
+	coverCell    int
 	coverT     float64
 	deepCell   int     // retreat: the next place deeper into cover we are walking to (-1 none)
 	deepT      float64 // ... when we chose it
@@ -576,6 +580,7 @@ func New(h *proto.Hello, w *world.World, nav *world.Nav, p Params) *Bot {
 	b.strafeSign = 1
 	b.targetID = -1
 	b.lootID = -1
+	b.coverHealCell = -1
 	b.coverCell = -1
 	b.deepCell, b.deepT, b.deepTryT = -1, -100, -100
 	b.nearCoverT = -100

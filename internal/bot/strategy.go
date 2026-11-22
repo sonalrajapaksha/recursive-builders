@@ -204,6 +204,10 @@ func (b *Bot) hiddenHere(ths []threat) bool {
 
 // findCover looks for the nearest walkable cell hidden from every listed threat.
 func (b *Bot) findCover(ths []threat, maxCost float64) int {
+	return b.findCoverWhere(ths, maxCost, nil)
+}
+
+func (b *Bot) findCoverWhere(ths []threat, maxCost float64, accept func(k int, hasEyes bool) bool) int {
 	type eyeT struct{ x, y, z float64 }
 	var eyes []eyeT
 	for i := range ths {
@@ -214,7 +218,7 @@ func (b *Bot) findCover(ths []threat, maxCost float64) int {
 		sc := tr.scale(b.sizePerCube)
 		eyes = append(eyes, eyeT{tr.Pos[0], tr.Pos[1], tr.Pos[2] + 8*sc})
 	}
-	if len(eyes) == 0 {
+	if len(eyes) == 0 && accept == nil {
 		return -1
 	}
 	z := &b.o.Zone
@@ -232,6 +236,9 @@ func (b *Bot) findCover(ths []threat, maxCost float64) int {
 			return true
 		}
 		if z.ShrinkEnd-b.t < 25 && hyp(x-z.NextCenter[0], y-z.NextCenter[1]) > z.NextRadius-4 {
+			return true
+		}
+		if accept != nil && !accept(k, len(eyes) > 0) {
 			return true
 		}
 		checked++

@@ -43,6 +43,9 @@ func (b *Bot) think(act *proto.Action) {
 	zi := b.zoneInfo()
 	ths := b.assess()
 	inc := b.gatherIncoming()
+	if b.P.CoverHeal && b.coverHealStep(act, zi, ths, inc) {
+		return
+	}
 	hpFrac := b.hp / b.maxHP
 
 	// --- who would we shoot
