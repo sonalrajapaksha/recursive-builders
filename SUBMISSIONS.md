@@ -43,4 +43,4 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 36 | cc3bb52862939ca4aa52ec94d352f6e988a86fa5 (tv-dv600w80: DropV 450/600 + DropWin 80) | docker PASS | scored, receipt BB-98623ABA | 6.25 (tie with dv600; earlier submission keeps the pick) |
 | 37 | 9b7d6fd1363ff37a12bdb6920ac9afc76fdc32c0 (tv-dfarm35: dv600 drops + FarmHP 0.35) | docker PASS | scored, receipt BB-C2A8AEF5 | 6.25 (no change vs dv600) |
 | 38 | waiprotein/mech-royale-bot 42c594fc51f2fecd457c984cb18f0ede9d3cf306 (third-party MIT giddy fork, scored as a reference only, not our code) | not built locally | scored, receipt BB-74AA3615 | 6.19 (about base, as predicted) |
-| 39 | 881288a9d3d0a3cb8ac5678b13367a8b1895ae65 (struct-ghost: dv600 + Practice=false, keep Ghost/sneak profile all match) | docker PASS | submitted, awaiting score | pending |
+| 39 | 881288a9d3d0a3cb8ac5678b13367a8b1895ae65 (struct-ghost: dv600 + Practice=false, keep Ghost/sneak profile all match) | docker PASS | scored, receipt BB-BB2C3B11 | 5.23 (-1.02 vs dv600; FALSIFIED) |
