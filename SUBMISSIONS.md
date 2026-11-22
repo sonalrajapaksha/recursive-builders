@@ -60,3 +60,4 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 53 | 5397bc5af0ce9ed4f1bb07bd1c887f7605ab5be5 (tv-dronestrict: range 55, HP 0.75, quiet 110) | docker PASS | scored, receipt BB-C97BAD66 | **6.35 (+0.06 vs drone 6.29): NEW BEST** |
 | 54 | 73a21f0699184b88e7f26c84067bda79b630f74e (tv-dronestrict2: range 40, HP 0.85, quiet 140) | docker PASS | scored, receipt BB-E9F7FD2F | 6.25 (-0.10 vs dronestrict 6.35; too strict) |
 | 55 | 74cb32240db351d33e73b90aa5ae6796b1e7babf (tv-cratelaser: laser opens crates, gates 55/0.75/110) | docker PASS | scored, receipt BB-7699498A | 6.02 (-0.33 vs dronestrict; dropped) |
+| 56 | e42892cb5dc867fcb841e53a4c8288d60fd34277 (ds2-wpn: lightning closes drone/crate farm range to 36 m) | docker PASS | submitted, receipt BB-DF387C83, awaiting score | pending |
