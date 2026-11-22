@@ -139,3 +139,4 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E135 | submitted av-lz260 (BB-E7F893EC); other av-* variants (pur10, harv60, gfar220, fzr90, late150) building in the background. |
 | E136 | built av-pur10 5ad09e9 (gear_pursuit_s 10), av-harv60 2c900b1 (harvest_site_s 60), av-gfar220 d7da2a5 (am_gfar 220), av-fzr90 008ed6a (fz_t0_r 90), av-late150 c022538 (gear_late_s 150); all docker PASS and pushed. Queue after av-lz260 (BB-E7F893EC): pur10, harv60, gfar220, fzr90, late150. |
 | E137 | builders-4: av-lz260 = 5.91 (-0.25 vs automata-base 6.16). Submitted av-pur10 (BB-8C5FA444). |
+| E138 | builders-4: av-pur10 = 5.82 (-0.34). With av-lz260 5.91, both variants sit ~0.3 below automata-base 6.16: either each tweak hurts or 6.16 is a favourable draw (typical automata ~5.9-6.1 on this scorer; same code gave 5.86 and 6.11 for other teams). Submitted av-harv60 (BB-36F1F8F1). |
