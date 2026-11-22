@@ -72,3 +72,4 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E68 | official tv-dloot220 (cbaaf04) = 6.06, -0.19 vs dv600: wider loot radius hurts. Final pick confirmed = tv-dv600 BB-64EFB59E 6.25. Next: stack gx-kill-regen on dv600 when a slot opens (~9:30 PM site time). |
 | E69 | built dv600-regen b89c083b87a132b1b76f77c3a05591a7829a9b6f (tv-dv600 + gx-kill-regen cherry-pick, docker PASS, pushed). To submit when a slot opens. |
 | E70 | submitted dv600-regen b89c083 (receipt BB-27E79305). Watcher reconnected after Chrome dropped; waiting for score. |
+| E71 | official dv600-regen (b89c083) = 6.25, ties dv600: gx-kill-regen has no effect in practice. Pick stays dv600 (earlier submission). Quota 0/6; no worker running. Plateau at 6.25 after ~40 scores; leaders 6.38-6.44. |
