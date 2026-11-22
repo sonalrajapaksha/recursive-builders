@@ -33,14 +33,14 @@ type Params struct {
 	PracticeAware bool    // adapt when the lobby looks like the cooperating house squad
 
 	// free-for-all stance (used once we see mechs dying that we did not kill)
-	FFAEngage     float64
-	FFADisengage  float64
-	FFALootRadius float64
-	FFAWantCubes  int
-	FFAReturnFire float64 // only shoot back at attackers closer than this
-	Salt          int     // changes the dice only (see New)
-	ForceFFA      bool    // testing: assume a free-for-all from the start
-	SlotRule      bool    // WRONG, never enable: the track page says the practice slot varies each match
+	FFAEngage      float64
+	FFADisengage   float64
+	FFALootRadius  float64
+	FFAWantCubes   int
+	FFAReturnFire  float64 // only shoot back at attackers closer than this
+	Salt           int     // changes the dice only (see New)
+	ForceFFA       bool    // testing: assume a free-for-all from the start
+	SlotRule       bool    // WRONG, never enable: the track page says the practice slot varies each match
 	CloseDisengage float64 // disengage threshold against an attacker within ~60 m (stealth stances)
 	DuelDisengage  float64 // leave a one-on-one only below this advantage
 
@@ -58,12 +58,12 @@ type Params struct {
 	PatientCubes  int
 	PatientRange  float64 // ... unless the hunter is closer than this
 	// hideouts from the embedded visibility map (stealth stances)
-	UseHideMap  bool
-	HideSeenW   float64 // weight of the share of ground that can see a place
-	HideHitW    float64 // weight of the share that has a line of fire to our centre there
-	HideDistW   float64 // points per metre of travel to get there
-	HideClimbW  float64 // points per metre of wall to climb
-	HideStick   float64 // bonus for the place we already chose
+	UseHideMap        bool
+	HideSeenW         float64 // weight of the share of ground that can see a place
+	HideHitW          float64 // weight of the share that has a line of fire to our centre there
+	HideDistW         float64 // points per metre of travel to get there
+	HideClimbW        float64 // points per metre of wall to climb
+	HideStick         float64 // bonus for the place we already chose
 	StealthFightRange float64 // stealth stances: stand and fight an attacker only inside this range (else slip away)
 	QuietHoldS        float64 // seconds without anyone near or watching before we call it quiet
 	LaserValue        float64 // pickup value of a laser (the gun is 2.0, a mortar 1.2)
@@ -101,7 +101,7 @@ type Params struct {
 	LootHiddenBias  float64 // brawl stance: loot in plain sight of a mech we know about is worth this much less (0..1)
 	CoverEdgeAdv    float64 // ... unless our estimated advantage is at least this (a laser against none needs only AvoidAdv)
 	HuntLaserEdge   bool    // brawl stance: start a fight only with a laser against a mech without one (or at CoverEdgeAdv)
-	Peek            bool   // brawl stance with a laser: fight from behind cover (charge hidden, step out to fire)
+	Peek            bool    // brawl stance with a laser: fight from behind cover (charge hidden, step out to fire)
 	PeekCover       float64 // ... if a hidden cell is within this path length
 	PeekReach       float64 // ... and a firing cell within this many metres of it
 	PeekMinRange    float64 // ... and the target is farther than this (closer than that it is a brawl)
@@ -132,10 +132,10 @@ type Params struct {
 	PlinkMaxDPS     float64 // under lighter fire than this from range (no laser on us), keep farming and shoot back in between (0 = off)
 	HuntRange       float64 // start a fight with a favourable target inside this range
 	HuntRangeLaser  float64 // ... when we hold a laser
-	KiteMin       float64 // against two or more attackers hold this range band from the nearest (0 = off)
-	KiteMax       float64
-	RoofFirstSecs float64 // opening: for this long, getting onto a nearby roof beats arming (0 = off)
-	RoofFirstDist float64 // ... if an access point is within this distance
+	KiteMin         float64 // against two or more attackers hold this range band from the nearest (0 = off)
+	KiteMax         float64
+	RoofFirstSecs   float64 // opening: for this long, getting onto a nearby roof beats arming (0 = off)
+	RoofFirstDist   float64 // ... if an access point is within this distance
 
 	// Apex-Go v2 breakthrough upgrades (all config-driven, individually ablatable via BOT_PARAMS)
 	AllNoMortar      bool    // refuse mortars in ALL stances whenever weapons.laser.cookoff > 0
@@ -159,25 +159,26 @@ type Params struct {
 	LightKiteBoost   bool    // boost-kite away when an enemy lightning carrier closes inside range+12
 
 	// Apex-Go v3 upgrades (from 402-repo GitHub re-probe, all config-driven & independently ablatable)
-	CoverReload      bool    // MarwanMoh11 v5.15: top off gun mag (ammo<=0.6*mag) behind cover when no enemy LOS >= 1.1s
-	UpV2             bool    // lukejwaszyn f58c537: exact sustained-DPS upgrade order (gun_mag +31% above gun_rate +8%)
-	CubeSmart        bool    // lukejwaszyn a37a738: price cube piles by cluster size & 1.75x bonus when crossing upgrade threshold
-	LaserMechOnly    bool    // andrew-zhouu v0.134: never start a laser charge on crates/NPCs (keep ready for mechs)
-	RearAvoidW       float64 // SandeepMadhavarapu 4f3c7d9: penalize steer positions putting extra attackers in our 1.5x rear arc
-	LaserCDTrack     bool    // MarwanMoh11 v5.11: track obs.Beams laser shots per enemy -> punish during 2s cooldown window
-	KillFocus        float64 // andrew-zhouu v0.134: weight of enemy missing HP in target scoring (0 = default 1.0)
-	Seek             float64 // andrew-zhouu v0.134: in squad stance, seek last-known enemy seen within Seek seconds (0 = off)
-	SeekRange        float64 // max range for Seek (default 320)
-	SeekHP           float64 // min hpFrac for Seek (default 0.65)
-	DropRun          float64 // andrew-zhouu v0.134: in squad stance, break off for supply drop within DropRun m (0 = off)
-	EdgeBias         float64 // andrew-zhouu v0.119: in FFA stance, prefer outer rim of next circle (0 = off)
-	EdgeBand         float64 // in FFA stance, penalize hiding closer than EdgeBand*NextRadius to center (0 = off)
-	PracticeRim      float64 // practice rim-riding: prefer outer 85-90% of next circle while NextRadius >= 180 (0 = off)
-	RetreatPest      bool    // shoot plinking NPC drone while retreating if no enemy mech is engaged
+	CoverReload   bool    // MarwanMoh11 v5.15: top off gun mag (ammo<=0.6*mag) behind cover when no enemy LOS >= 1.1s
+	UpV2          bool    // lukejwaszyn f58c537: exact sustained-DPS upgrade order (gun_mag +31% above gun_rate +8%)
+	CubeSmart     bool    // lukejwaszyn a37a738: price cube piles by cluster size & 1.75x bonus when crossing upgrade threshold
+	LaserMechOnly bool    // andrew-zhouu v0.134: never start a laser charge on crates/NPCs (keep ready for mechs)
+	RearAvoidW    float64 // SandeepMadhavarapu 4f3c7d9: penalize steer positions putting extra attackers in our 1.5x rear arc
+	LaserCDTrack  bool    // MarwanMoh11 v5.11: track obs.Beams laser shots per enemy -> punish during 2s cooldown window
+	KillFocus     float64 // andrew-zhouu v0.134: weight of enemy missing HP in target scoring (0 = default 1.0)
+	Seek          float64 // andrew-zhouu v0.134: in squad stance, seek last-known enemy seen within Seek seconds (0 = off)
+	SeekRange     float64 // max range for Seek (default 320)
+	SeekHP        float64 // min hpFrac for Seek (default 0.65)
+	DropRun       float64 // andrew-zhouu v0.134: in squad stance, break off for supply drop within DropRun m (0 = off)
+	EdgeBias      float64 // andrew-zhouu v0.119: in FFA stance, prefer outer rim of next circle (0 = off)
+	EdgeBand      float64 // in FFA stance, penalize hiding closer than EdgeBand*NextRadius to center (0 = off)
+	PracticeRim   float64 // practice rim-riding: prefer outer 85-90% of next circle while NextRadius >= 180 (0 = off)
+	RetreatPest   bool    // shoot plinking NPC drone while retreating if no enemy mech is engaged
 }
 
 func DefaultParams() Params {
 	return Params{
+		AccelLead:     true,
 		Name:          "apex-go",
 		EngageRatio:   1.25,
 		DisengageRat:  0.75,
@@ -194,28 +195,28 @@ func DefaultParams() Params {
 		PracticeAware: true,
 		Salt:          8,
 		// SlotRule stays off: the track page says the practice slot varies each match
-		FFAEngage:     1.8,
-		FFADisengage:  0.95,
-		FFALootRadius: 140,
-		FFAWantCubes:  10,
-		FFAReturnFire: 230,
-		CloseDisengage: 0.8,
-		DuelDisengage:  0.5,
-		UseRoofs:       true,
-		RoofMaxClimb:   40,
-		RoofMinHeight:  12,
-		RoofMinZone:    60,
-		ArmRadius:      110,
-		OpenSecs:       24,
-		CreditOpenS:    25,
-		DropRadius:     300,
-		LeaveTTD:       10,
-		UseHideMap:     false, // stealth hideouts: unused by the brawl stance (kept for the variants)
-		HideSeenW:      0.6,
-		HideHitW:       0.9,
-		HideDistW:      0.16,
-		HideClimbW:     0.5,
-		HideStick:      12,
+		FFAEngage:         1.8,
+		FFADisengage:      0.95,
+		FFALootRadius:     140,
+		FFAWantCubes:      10,
+		FFAReturnFire:     230,
+		CloseDisengage:    0.8,
+		DuelDisengage:     0.5,
+		UseRoofs:          true,
+		RoofMaxClimb:      40,
+		RoofMinHeight:     12,
+		RoofMinZone:       60,
+		ArmRadius:         110,
+		OpenSecs:          24,
+		CreditOpenS:       25,
+		DropRadius:        300,
+		LeaveTTD:          10,
+		UseHideMap:        false, // stealth hideouts: unused by the brawl stance (kept for the variants)
+		HideSeenW:         0.6,
+		HideHitW:          0.9,
+		HideDistW:         0.16,
+		HideClimbW:        0.5,
+		HideStick:         12,
 		StealthFightRange: 140,
 		QuietHoldS:        3,
 		LaserValue:        6.0,
@@ -245,45 +246,45 @@ func DefaultParams() Params {
 		// against 66%) but gives up a quarter of the early lasers, and in the re-enactment the deaths
 		// only move from before 30 s to after it: about +0.1 points by the real-match index. Against
 		// the practice squad it costs 0.4, hence the SlotRule it would need.
-		ShyRange:          220,
-		ShyLaser:          60,
-		ShyMem:            6,
+		ShyRange: 220,
+		ShyLaser: 60,
+		ShyMem:   6,
 		// RetreatRunMax 50 / RetreatRunLaser 90 (variant b-standrun) is not on: the real matches favour it
 		// (one attacker inside 60 m, shot back: alive 20 s later 35% staying against 23% running),
 		// every simulator here puts it 0.1-0.2 points behind, and either way it is a small thing.
-		RetreatRunLaser:   90,
-		HuntLaserEdge:     true,
-		LootHiddenBias:    0.5,
-		CoverMinRange:     40,
-		CoverEdgeAdv:      3.0,
-		PeekCover:         25,
-		PeekReach:         9,
-		PeekMinRange:      45,
-		RoofCoverHold:     6,
-		RoofStandCheck:    true,
-		DropStick:         true,
-		RoofLeaveQuiet:    25,
-		ClimbClearRange:   150,
-		BrawlRoofs:        true,
-		LaserPreempt:      true,
-		LaserAimRange:     285,
-		AvoidCoverLaser:   90,
-		BrawlRoofCubes:    6,
-		BrawlRoofAfter:    60,
-		LeadPersist:       true,
-		LeadCum:           true,
-		LeadCumMin:        8,
-		PathFix:           true,
-		CreditFix:         true,
-		LootBoost:         30,
-		ProvokeRule:       true,
-		PlinkMaxDPS:       60,
-		HuntRange:         130,
-		HuntRangeLaser:    130,
-		KiteMin:        130,
-		KiteMax:        190,
-		PatientCubes:   10,
-		PatientRange:   70,
+		RetreatRunLaser: 90,
+		HuntLaserEdge:   true,
+		LootHiddenBias:  0.5,
+		CoverMinRange:   40,
+		CoverEdgeAdv:    3.0,
+		PeekCover:       25,
+		PeekReach:       9,
+		PeekMinRange:    45,
+		RoofCoverHold:   6,
+		RoofStandCheck:  true,
+		DropStick:       true,
+		RoofLeaveQuiet:  25,
+		ClimbClearRange: 150,
+		BrawlRoofs:      true,
+		LaserPreempt:    true,
+		LaserAimRange:   285,
+		AvoidCoverLaser: 90,
+		BrawlRoofCubes:  6,
+		BrawlRoofAfter:  60,
+		LeadPersist:     true,
+		LeadCum:         true,
+		LeadCumMin:      8,
+		PathFix:         true,
+		CreditFix:       true,
+		LootBoost:       30,
+		ProvokeRule:     true,
+		PlinkMaxDPS:     60,
+		HuntRange:       130,
+		HuntRangeLaser:  130,
+		KiteMin:         130,
+		KiteMax:         190,
+		PatientCubes:    10,
+		PatientRange:    70,
 		// Apex-Go v2 verified winners (#1 6.28 official; 4.70 192m grand; 8.35 FFA)
 		AntiLightningW:   180,
 		AntiLightningPad: 12,
@@ -305,42 +306,42 @@ func DefaultParams() Params {
 
 // Track is what we remember about another mech or drone.
 type Track struct {
-	ID       int
-	NPC      bool
-	Pos, Vel [3]float64
-	Aim      [2]float64
-	HP       float64
-	MaxHP    float64
-	Cubes    int
-	Laser    bool
-	Mortar   bool
-	Light    bool
-	Gun      bool
-	Charging bool
-	LastSeen float64 // match time of the last observation that listed it
-	Listed   bool    // listed in the current observation
-	LOS      bool    // we have a clear line from our eye to it right now
-	LOST     float64 // last time LOS was true
-	HurtMeT  float64 // last time it damaged us
-	HurtMe   float64 // decayed damage it dealt to us
-	IHurtT   float64 // last time we damaged it
-	IHurt    float64 // decayed damage we dealt to it
-	AimAtMeT float64 // last time its aim pointed at us
-	SeenT0   float64
-	PhantomT float64 // last time it hit us while unseen (its Pos is then a guess along the bearing)
-	WasListed bool   // listed in the previous observation
-	ViewT    float64 // last time it was inside our own field of view (not just remembered)
-	EngT     float64 // last time it counted as engaged with us
+	ID          int
+	NPC         bool
+	Pos, Vel    [3]float64
+	Aim         [2]float64
+	HP          float64
+	MaxHP       float64
+	Cubes       int
+	Laser       bool
+	Mortar      bool
+	Light       bool
+	Gun         bool
+	Charging    bool
+	LastSeen    float64 // match time of the last observation that listed it
+	Listed      bool    // listed in the current observation
+	LOS         bool    // we have a clear line from our eye to it right now
+	LOST        float64 // last time LOS was true
+	HurtMeT     float64 // last time it damaged us
+	HurtMe      float64 // decayed damage it dealt to us
+	IHurtT      float64 // last time we damaged it
+	IHurt       float64 // decayed damage we dealt to it
+	AimAtMeT    float64 // last time its aim pointed at us
+	SeenT0      float64
+	PhantomT    float64 // last time it hit us while unseen (its Pos is then a guess along the bearing)
+	WasListed   bool    // listed in the previous observation
+	ViewT       float64 // last time it was inside our own field of view (not just remembered)
+	EngT        float64 // last time it counted as engaged with us
 	LaserFiredT float64 // last time we saw this mech fire a laser beam (for cooldown punish window)
 
 	accel [2]float64 // smoothed horizontal acceleration from consecutive observations
 
 	// recent motion, for choosing how to lead it (see lead.go)
-	hist            [trkHist]trkSample
-	hn, hi          int     // samples held, index of the next write
-	leadN           float64 // (decayed) number of virtual shots scored
-	missNone        float64 // (decayed) sum of what aiming at where it stood would have missed by
-	missLead        float64 // ... and what leading it would have missed by
+	hist     [trkHist]trkSample
+	hn, hi   int     // samples held, index of the next write
+	leadN    float64 // (decayed) number of virtual shots scored
+	missNone float64 // (decayed) sum of what aiming at where it stood would have missed by
+	missLead float64 // ... and what leading it would have missed by
 }
 
 const trkHist = 40 // four seconds at ten observations a second
@@ -431,15 +432,15 @@ type Bot struct {
 	cubes   map[int]*Item
 	pickups map[int]*Item
 
-	lastDamageT  float64 // last time we took damage from anything
-	lastWeaponDT float64 // last time a weapon (not zone) hurt us
+	lastDamageT   float64 // last time we took damage from anything
+	lastWeaponDT  float64 // last time a weapon (not zone) hurt us
 	lastEnemyLOST float64 // last time any enemy mech had LOS to us (for cover-pause top-off reload)
-	lastDealtT   float64
-	recentDmg    float64 // decayed damage taken
-	lastDmgBear  float64
-	lastDmgBy    int
-	lastSoundT   float64
-	lastSoundB   float64
+	lastDealtT    float64
+	recentDmg     float64 // decayed damage taken
+	lastDmgBear   float64
+	lastDmgBy     int
+	lastSoundT    float64
+	lastSoundB    float64
 
 	// movement state
 	path       []int32
@@ -458,89 +459,89 @@ type Bot struct {
 	lastMove   [2]float64
 
 	// strategy state
-	mode       string
-	targetID   int
-	retreating bool
-	coverCell  int
-	coverT     float64
-	deepCell   int     // retreat: the next place deeper into cover we are walking to (-1 none)
-	deepT      float64 // ... when we chose it
-	deepTryT   float64 // ... when we last looked for one
-	standT      float64 // last time we stayed in a fight for want of cover close by
-	creditAbsorbT float64 // last death we put down to our own shooting without being given the kill
-	nearCoverT  float64 // coverClose: when we last looked
-	nearCoverOK bool    // ... and what we found
-	lootID     int
-	lootT      float64
-	holdCell   int
-	holdT      float64
-	lastAimCmd [2]float64
-	scanPhase  float64
-	laserHold  bool
-	takeT      float64
-	ffaSeenT    float64 // last time we saw evidence other mechs fight each other
-	ffaBeams    int     // count of distinct observations with distant enemy-on-enemy beams
-	kills       int
-	killsSeen   int
-	deadSeen    int
-	unexplained int  // deaths we did not cause
-	ffa         bool // the lobby is a free-for-all (others kill each other)
-	st          stance
-	evadeCell   int
-	evadeT      float64
-	hideT       float64
-	lastLabel   string
-	modeLabel   string // stance:mode of this decision
-	lastTraceT  float64
-	lastNpcDT   float64
-	seenT       []float32 // coarse grid: when we last looked at each cell
-	seenNX      int
-	seenNY      int
-	roamCell    int
-	roamT       float64
-	dmgLog      []dmgRec
-	modeLog     []modeRec
-	hitLog      []hitRec
-	lowT        float64
-	retreatT    float64
-	corneredT   float64
-	zgKey       [3]float64 // zone-goal cache
-	zgT         float64
-	zgComp      int32
-	zgGoal      [2]float64
-	zgWalk      bool
-	myComp      int32           // walkable region we are in (0 unknown)
-	mainCompID  int32           // the largest walkable region (cached)
-	surf        []int32         // route over the top surface (overland travel)
-	surfGoal    [2]float64
-	surfT       float64
-	surfIdx     int
-	surfBan     map[int]float64 // surface cells that turned out to be impassable
-	surfWatchT  float64
-	surfWatchPos [3]float64
-	surfPushing bool
-	banUntil    map[int]float64 // loot ids / roam cells we could not reach
-	seekBan     map[int]float64 // mech ids we sought and didn't find there
-	roof        roofPlan
-	roofCoverC  int
-	roofCoverT  float64
-	unquietT    float64  // last time someone was near or watching
-	peek        peekPlan // laser fight from behind cover: the current hide and fire cells
-	roofCoverHoldT float64 // last time something made us duck behind the roof edge
-	holdClimb   bool     // do not start jetting up a wall right now (someone is watching or shooting)
-	holdRoofMove bool    // do not leave the roof we are on right now (same reason; the zone is not close yet)
-	jinkSign    float64  // which side the current zig of a zig-zag goes
-	jinkT       float64  // when it flips next
-	edgeOnT     float64  // last time we stood to fight on an edge (brawl stance)
-	slipCell    int      // cover we are slipping to (brawl stance)
-	slipT       float64  // when it was last looked for
-	slipOnT     float64  // last time we decided to slip
-	hm          *hideMap // embedded visibility map (nil if it does not fit this arena)
-	hideCell    int      // hideout we are heading for or sitting in (-1 none)
-	hideOut     hideout
-	hideOutOK   bool
-	hideOutT    float64
-	roofFirstOK bool
+	mode             string
+	targetID         int
+	retreating       bool
+	coverCell        int
+	coverT           float64
+	deepCell         int     // retreat: the next place deeper into cover we are walking to (-1 none)
+	deepT            float64 // ... when we chose it
+	deepTryT         float64 // ... when we last looked for one
+	standT           float64 // last time we stayed in a fight for want of cover close by
+	creditAbsorbT    float64 // last death we put down to our own shooting without being given the kill
+	nearCoverT       float64 // coverClose: when we last looked
+	nearCoverOK      bool    // ... and what we found
+	lootID           int
+	lootT            float64
+	holdCell         int
+	holdT            float64
+	lastAimCmd       [2]float64
+	scanPhase        float64
+	laserHold        bool
+	takeT            float64
+	ffaSeenT         float64 // last time we saw evidence other mechs fight each other
+	ffaBeams         int     // count of distinct observations with distant enemy-on-enemy beams
+	kills            int
+	killsSeen        int
+	deadSeen         int
+	unexplained      int  // deaths we did not cause
+	ffa              bool // the lobby is a free-for-all (others kill each other)
+	st               stance
+	evadeCell        int
+	evadeT           float64
+	hideT            float64
+	lastLabel        string
+	modeLabel        string // stance:mode of this decision
+	lastTraceT       float64
+	lastNpcDT        float64
+	seenT            []float32 // coarse grid: when we last looked at each cell
+	seenNX           int
+	seenNY           int
+	roamCell         int
+	roamT            float64
+	dmgLog           []dmgRec
+	modeLog          []modeRec
+	hitLog           []hitRec
+	lowT             float64
+	retreatT         float64
+	corneredT        float64
+	zgKey            [3]float64 // zone-goal cache
+	zgT              float64
+	zgComp           int32
+	zgGoal           [2]float64
+	zgWalk           bool
+	myComp           int32   // walkable region we are in (0 unknown)
+	mainCompID       int32   // the largest walkable region (cached)
+	surf             []int32 // route over the top surface (overland travel)
+	surfGoal         [2]float64
+	surfT            float64
+	surfIdx          int
+	surfBan          map[int]float64 // surface cells that turned out to be impassable
+	surfWatchT       float64
+	surfWatchPos     [3]float64
+	surfPushing      bool
+	banUntil         map[int]float64 // loot ids / roam cells we could not reach
+	seekBan          map[int]float64 // mech ids we sought and didn't find there
+	roof             roofPlan
+	roofCoverC       int
+	roofCoverT       float64
+	unquietT         float64  // last time someone was near or watching
+	peek             peekPlan // laser fight from behind cover: the current hide and fire cells
+	roofCoverHoldT   float64  // last time something made us duck behind the roof edge
+	holdClimb        bool     // do not start jetting up a wall right now (someone is watching or shooting)
+	holdRoofMove     bool     // do not leave the roof we are on right now (same reason; the zone is not close yet)
+	jinkSign         float64  // which side the current zig of a zig-zag goes
+	jinkT            float64  // when it flips next
+	edgeOnT          float64  // last time we stood to fight on an edge (brawl stance)
+	slipCell         int      // cover we are slipping to (brawl stance)
+	slipT            float64  // when it was last looked for
+	slipOnT          float64  // last time we decided to slip
+	hm               *hideMap // embedded visibility map (nil if it does not fit this arena)
+	hideCell         int      // hideout we are heading for or sitting in (-1 none)
+	hideOut          hideout
+	hideOutOK        bool
+	hideOutT         float64
+	roofFirstOK      bool
 	roofFirstChecked bool
 	// debug accounting (Stats)
 	roofSecs      float64
@@ -549,8 +550,8 @@ type Bot struct {
 	dmgClimb      float64
 	climbs        int
 	prevRoofState int
-	creditT     float64 // last time we damaged a mech (deaths right after count as ours)
-	creditID    int     // ... and which one
+	creditT       float64 // last time we damaged a mech (deaths right after count as ours)
+	creditID      int     // ... and which one
 
 	scratch []cand
 }
@@ -703,7 +704,7 @@ func (b *Bot) Act(o *proto.Obs) proto.Action {
 		// near death: who did this, from where, could we see them
 		b.lowT = b.t
 		type agg struct {
-			dmg, d float64
+			dmg, d  float64
 			n, seen int
 			w       string
 		}
