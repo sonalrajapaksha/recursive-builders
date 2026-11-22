@@ -93,6 +93,8 @@ impl Brain {
             };
             max_range = max_range.max(r);
         }
+        let use_fallback = self.p.retreat_fire_fallback && self.mode == Mode::Retreat;
+        let mut fallback: Option<(f64, AimTarget)> = None;
         let mut best: Option<(f64, AimTarget, bool)> = None;
         let held = self.held(t);
         let gate = self.gate_closed(obs);
@@ -145,11 +147,21 @@ impl Brain {
             }
             let keep = !(self.fz.hide3 && self.fz3(obs) && d >= self.p.fz3_o_r && frac(tr.hp, tr.max_hp) >= self.p.fz3_finish);
             let allow = (allow0 || ret) && keep;
+            if use_fallback && allow && clear && d < max_range
+                && fallback.as_ref().map_or(true, |b| s > b.0)
+            {
+                fallback = Some((s, at.clone()));
+            }
             if best.as_ref().map_or(true, |b| s > b.0) {
                 best = Some((s, at, allow));
             }
         }
         if let Some((_, at, allow)) = best {
+            if !allow {
+                if let Some((_, shootable)) = fallback {
+                    return Some((shootable, true));
+                }
+            }
             return Some((at, allow));
         }
         let mut bn: Option<(f64, AimTarget, bool)> = None;
@@ -485,5 +497,41 @@ impl Brain {
         out.aim = cmd;
         out.target = Some(tg);
         out
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::brain::params::Params;
+    use crate::proto::Hello;
+    use crate::Shared;
+    use std::sync::Arc;
+
+    #[test]
+    fn retreat_uses_allowed_candidate_when_best_is_blocked_by_policy() {
+        let hello = Hello::default();
+        let world = World::empty();
+        let nav = crate::nav::Nav::build(&world, &hello.config.mech);
+        let shared = Arc::new(Shared { world, nav });
+        let mut brain = Brain::with_params(&hello, shared.clone(), Params::default());
+        brain.mode = Mode::Retreat;
+        brain.target = Tgt::Mech(2);
+        let mut obs: Obs = serde_json::from_str(r#"{
+            "t":30,"self":{"id":1,"weapons":[{"kind":"gun","ammo":12},null]},
+            "mechs":[
+                {"id":2,"kind":"mech","pos":[70,0,0],"hp":100,"max_hp":1400},
+                {"id":3,"kind":"mech","pos":[140,25,0],"hp":1400,"max_hp":1400}],
+            "events":[{"type":"damaged","amount":45,"weapon":"gun","by":3}]
+        }"#).unwrap();
+        obs.me.weapons[0].as_mut().unwrap().stats = hello.config.weapons.gun.clone();
+        brain.mem.update(&obs, &shared.world, &hello.config);
+        let muzzle = up(obs.me.pos, obs.me.stats.muzzle_height);
+
+        let (target, allow) = brain.pick_fire_target(&obs, &shared.world, muzzle).unwrap();
+        assert_eq!((target.feet[0], allow), (70.0, false));
+        Arc::make_mut(&mut brain.p).retreat_fire_fallback = true;
+        let (target, allow) = brain.pick_fire_target(&obs, &shared.world, muzzle).unwrap();
+        assert_eq!((target.feet[0], allow), (140.0, true));
     }
 }
