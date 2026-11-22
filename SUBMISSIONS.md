@@ -55,3 +55,4 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 48 | 477ce204451a51325467150b8cfcdc1fcd6cb673 (dv600-roof: rooftop fortress, Roof=1) | docker PASS | scored, receipt BB-521E15CE | 4.69 (-1.56 vs dv600; FALSIFIED) |
 | 49 | 2cd669ff2155b19b7d20f810edd174663149e680 (dv600-roof-lite: Roof=2, climbs only after contact) | docker PASS | scored, receipt BB-1CE6B233 | 4.58 (-1.67 vs dv600; FALSIFIED) |
 | 50 | 54a8db93c9ffaff677bd49e981f17b5fece4f872 (dv600-drone: DroneLaser) | docker PASS | scored, receipt BB-5E6CF520 | **6.29 (+0.04 vs dv600): NEW BEST** |
+| 51 | b67834990a65c9932e211e1d05d1af306b5fbf48 (dv600-kite: zone kiting) | docker PASS | submitted, receipt BB-F72C08F5, awaiting score | pending |
