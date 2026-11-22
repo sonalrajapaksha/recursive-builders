@@ -155,6 +155,7 @@ type Params struct {
 	DropV1      float64
 	DropV2      float64
 	DropWin     float64
+	DroneLaser  bool
 }
 
 func DefaultParams() Params {
@@ -998,11 +999,12 @@ func (b *Brain) step(o *Obs, act *Action) {
 					act.Fire[i] = true
 				}
 			case "laser":
-				if !isMech || dist > w.Stats.Range*0.97 {
+				droneOK := !isMech && b.droneLaserOK(farm, seen, hpFrac, dist)
+				if (!isMech && !droneOK) || dist > w.Stats.Range*0.97 {
 					break
 				}
 				full := w.Stats.Charge
-				if b.P.Lethal && w.Charge >= w.Stats.MinCharge && w.Charge < full-0.051 {
+				if isMech && b.P.Lethal && w.Charge >= w.Stats.MinCharge && w.Charge < full-0.051 {
 					dmg := w.Stats.Damage * (w.Stats.MinFrac + (1-w.Stats.MinFrac)*w.Charge/full) *
 						(1 + b.Cfg.Cubes.DamagePerCube*float64(min(me.Cubes, b.Cfg.Cubes.StatCap)))
 					if holds(target.Weapons, "mortar") {
