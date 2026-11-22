@@ -63,3 +63,4 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E59 | official tv-dv600 (863fa4e) = 6.25: new best. Neither priority (dv400) nor window (dwin45) alone moved it, but both together plus 450/600 did. Next: push further (DropV 1000/1500, DropWin 60/80) on dtune-base. |
 | E60 | built tv-dv1000 318edef and tv-dv600w80 cc3bb52 (dtune-base). Submitted dv1000; dv600w80 next. |
 | E61 | official tv-dv1000 (318edef) = 6.23, below dv600 6.25: stronger priority does not help; 6.25 stays best. Submitted tv-dv600w80. |
+| E62 | official tv-dv600w80 (cc3bb52) = 6.25, ties dv600 (window 40 vs 80 no difference). Pick stays dv600. Next: stack untested knobs FarmHP 0.35 and LootRadius 220 on the dv600 drop settings. |
