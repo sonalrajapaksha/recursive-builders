@@ -73,3 +73,4 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E69 | built dv600-regen b89c083b87a132b1b76f77c3a05591a7829a9b6f (tv-dv600 + gx-kill-regen cherry-pick, docker PASS, pushed). To submit when a slot opens. |
 | E70 | submitted dv600-regen b89c083 (receipt BB-27E79305). Watcher reconnected after Chrome dropped; waiting for score. |
 | E71 | official dv600-regen (b89c083) = 6.25, ties dv600: gx-kill-regen has no effect in practice. Pick stays dv600 (earlier submission). Quota 0/6; no worker running. Plateau at 6.25 after ~40 scores; leaders 6.38-6.44. |
+| E72 | Per user: new variant design delegated to an Opus (low effort) Orca worker, branches dv600-<name>, no submission by the worker. Its variants go to the FRONT of the submission queue (ahead of any remaining old-branch variants) when a slot opens (~3:50 PM site time). |
