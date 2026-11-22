@@ -78,3 +78,4 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E74 | submitted dv600-healdrop e22f911 (receipt BB-3B48C147). Next in queue: dv600-predrop b0ce21d, dv600-zonecover 829200b. |
 | E75 | official dv600-healdrop (e22f911) = 6.19, -0.06 vs 6.25: retreating to a landing drop does not help. Next dv600-predrop b0ce21d when slot opens (~4:05 PM site time). |
 | E76 | submitted dv600-predrop b0ce21d (receipt BB-8F12CD09). Watcher polling ran fast vs wall clock; used a background sleep timer to wait for the slot instead. Next: dv600-zonecover 829200b. |
+| E77 | official dv600-predrop (b0ce21d) = 5.71, -0.54: walking to the next zone centre before drop calls runs into the squad. Contrast: the squad profile loses when pulled toward the centre early. Next dv600-zonecover 829200b at ~4:11 PM site time. |
