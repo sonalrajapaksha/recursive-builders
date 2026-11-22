@@ -13,10 +13,11 @@ import (
 func TestAccelLeadGate(t *testing.T) {
 	h := &proto.Hello{}
 	b := Bot{P: DefaultParams(), C: &h.Config}
+	b.P.AccelLead = false
 	tr := &Track{Listed: true, WasListed: true}
 	tr.updateAccel([3]float64{0, 5, 0}, 0.1)
 	if b.targetOf(tr).gunAccel != [2]float64{} {
-		t.Fatal("default parameters applied acceleration lead")
+		t.Fatal("disabled AccelLead gate applied acceleration lead")
 	}
 	b.P.AccelLead = true
 	if got := b.targetOf(tr).gunAccel; got[0] != 0 || got[1] <= 0 {
