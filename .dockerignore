@@ -1,3 +1,5 @@
 *
-!*.py
-!Dockerfile
+!Cargo.toml
+!Cargo.lock
+!src/
+!bot.json

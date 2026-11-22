@@ -57,6 +57,16 @@ Attach `debug` to any action (protocol.md §6) to record lines, points, and labe
 - TypeScript wrapper calls: `draw.line(...)` and the matching helpers.
 
 ---
-## Our bot (recursive-builders)
-Root `Dockerfile` runs `bot.py`. See PROGRESS.md, EXPERIMENTS.md, SUBMISSIONS.md, INTERFACE.md.
-Build: `docker build --platform linux/amd64 -t rb-bot .`; check per protocol.md §1.
+## Our bot (recursive-builders), branch `automata-base`
+On this branch the root `Dockerfile` builds and runs the vendored Rust bot **automata** (`Cargo.toml`, `src/`,
+`bot.json`); `.dockerignore` sends only those files to the build. The older Python files (`bot.py` etc.) stay
+in the tree for reference but are not built. See PROGRESS.md, EXPERIMENTS.md, SUBMISSIONS.md.
+Build: `docker build --platform linux/amd64 -t automata-base .`; check per the command above.
+
+## ATTRIBUTION
+- Source: https://github.com/jason-scheffel/automata at commit `91f713207d6ad23363505fa82ed2bf683c990ad3`.
+- Licence: MIT, Copyright (c) 2026 Jason Scheffel. The licence text is kept verbatim in `LICENSE` at the root.
+- We only vendored it: `Cargo.toml`, `Cargo.lock`, `Dockerfile`, `bot.json`, `src/` and `tests/world_tests.rs`
+  are copied unchanged (no upstream `.git`).
+- Our changes: `src/runtime.rs` `BOT_NAME` set to `"recursive"` (upstream `"automata"`; only the name sent in
+  the `ready` message); our own `.dockerignore` (whitelist) and a `target/` line in `.gitignore`.
