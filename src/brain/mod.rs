@@ -329,6 +329,9 @@ impl Brain {
         self.wave_count(obs);
         self.mem.range_ban = self.p.take_range_ban;
         self.mem.update(obs, world, &self.cfg);
+        if self.p.forget_missing_npc {
+            self.mem.forget_missing_npcs(obs, world, &self.cfg);
+        }
         self.sf_update(obs, world);
         self.vx_update(obs, world);
         if self.p.aimz_on > 0.0 {
