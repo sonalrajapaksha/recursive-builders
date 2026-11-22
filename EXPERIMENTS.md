@@ -98,3 +98,4 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E94 | submitted dv600-drone (BB-5E6CF520). dv600-kite b678349 next. |
 | E95 | official dv600-drone (54a8db9) = 6.29: new best, +0.04 over dv600. Laser at the farm drone helps slightly. The site offers "Pick as our final entry" for it; pick is NOT changed by me (account setting) pending user OK. Submitting dv600-kite next; then stack drone+kite if both help. |
 | E96 | submitted dv600-kite (BB-F72C08F5). Next: if kite helps, stack drone+kite; also consider more drone-laser tuning (range/HP gates). |
+| E97 | official dv600-kite (b678349) = 5.98, -0.27: zone kiting loses; closed. Drone-laser (6.29) is the only live lead; next: parametrise its gates (range 75, HP 0.6, mech-seen 80 m) and test larger/smaller. |
