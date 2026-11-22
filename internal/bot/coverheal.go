@@ -7,13 +7,13 @@ func (b *Bot) coverHealActive(zi zoneInfo, nearest float64) bool {
 		return false
 	}
 	fraction := b.hp / b.maxHP
-	if fraction >= 0.90 {
+	if fraction >= b.P.CoverHealClear {
 		b.coverHealOn = false
 	}
 	if zi.urgent || zi.critical || nearest <= 80 {
 		return false
 	}
-	if fraction < 0.60 {
+	if fraction < b.P.CoverHealStart {
 		b.coverHealOn = true
 	}
 	return b.coverHealOn
@@ -33,7 +33,7 @@ func (b *Bot) coverHealStep(act *proto.Action, zi zoneInfo, ths []threat, inc []
 	}
 
 	// Leave enough time for regeneration and a short walk to the shelter.
-	seconds := 5 + (0.90*b.maxHP-b.hp)/45
+	seconds := 5 + (b.P.CoverHealClear*b.maxHP-b.hp)/45
 	accept := func(k int, hasEyes bool) bool {
 		x, y := b.Nav.Pos(k)
 		return b.inFutureZone(x, y, seconds+6, 4) && (hasEyes || b.coverHealSheltered(k))
