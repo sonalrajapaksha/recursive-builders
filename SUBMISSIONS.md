@@ -39,4 +39,5 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 32 | f2e0c1395f5b1eadd3f7e37caa88b27e75ec731a (tv-dv400: dtune-base 4a16f10 + DropV1 300/DropV2 400) | docker PASS | scored, receipt BB-0FE9EAD0 | 6.21 (identical to gx-cube-drops: DropV values no effect) |
 | 33 | 2616995f18133262d4500e8b6ad95e332ccf123f (tv-dwin45: dtune-base + DropWin 45) | docker PASS | scored, receipt BB-BE0C77AD | 6.21 (identical to gx-cube-drops: arrival window no effect) |
 | 34 | 863fa4e85d7fefb93fec4d0bbaaa8a4b61cad967 (tv-dv600: DropV 450/600 + DropWin 40) | docker PASS | scored, receipt BB-64EFB59E | **6.25 (+0.04): NEW BEST, shown as final pick** |
-| 35 | 318edef23b7563eb9304705712356edbbec4a543 (tv-dv1000: DropV 1000/1500 + DropWin 60) | docker PASS | submitted, awaiting score | pending |
+| 35 | 318edef23b7563eb9304705712356edbbec4a543 (tv-dv1000: DropV 1000/1500 + DropWin 60) | docker PASS | scored, receipt BB-09803706 | 6.23 (below dv600 6.25) |
+| 36 | cc3bb52862939ca4aa52ec94d352f6e988a86fa5 (tv-dv600w80: DropV 450/600 + DropWin 80) | docker PASS | submitted, awaiting score | pending |

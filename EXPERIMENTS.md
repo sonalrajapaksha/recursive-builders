@@ -62,3 +62,4 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E58 | official tv-dwin45 (2616995) = 6.21 identical: DropWin has no effect either. Drops lever exhausted by priority and window; the gain comes only from UseDrops being on. Submitted tv-dv600 (last drops variant). |
 | E59 | official tv-dv600 (863fa4e) = 6.25: new best. Neither priority (dv400) nor window (dwin45) alone moved it, but both together plus 450/600 did. Next: push further (DropV 1000/1500, DropWin 60/80) on dtune-base. |
 | E60 | built tv-dv1000 318edef and tv-dv600w80 cc3bb52 (dtune-base). Submitted dv1000; dv600w80 next. |
+| E61 | official tv-dv1000 (318edef) = 6.23, below dv600 6.25: stronger priority does not help; 6.25 stays best. Submitted tv-dv600w80. |
