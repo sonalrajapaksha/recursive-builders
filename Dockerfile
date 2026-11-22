@@ -1,5 +1,7 @@
-# Build: docker build --platform linux/amd64 -t rb-bot .   (map is mounted at /arena at runtime)
-FROM python:3.13-slim
+# Mech Royale bot (mechfight/1). The match runs it with no network, a read-only root
+# (writable /tmp), 1 CPU, 512 MB, uid 65534, and the map mounted at /arena.
+FROM oven/bun:1.4.4-slim
 WORKDIR /bot
-COPY *.py /bot/
-ENTRYPOINT ["python3", "-u", "/bot/bot.py"]
+COPY package.json mechfight.ts ./
+COPY src ./src
+ENTRYPOINT ["bun", "/bot/src/main.ts"]
