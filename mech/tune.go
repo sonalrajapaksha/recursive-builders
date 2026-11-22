@@ -32,3 +32,12 @@ func applyTune(p Params) Params {
 	}
 	return p
 }
+
+// tuneSalt perturbs the RNG seed (tune.json key "Salt"); 0 keeps the base stream.
+func tuneSalt() int64 {
+	var m map[string]float64
+	if json.Unmarshal(tuneRaw, &m) != nil {
+		return 0
+	}
+	return int64(m["Salt"]) * 7919
+}
