@@ -88,4 +88,5 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 81 | 0bb1bba6ab373319091f9ffa6ce2af1eeed41474 (ap-c3-lo: combo3 + CoverHeal 50/85; docker PASS p99 3.8 ms) | docker PASS | scored on builders-4, receipt BB-0207EC75 | 6.14 |
 | 82 | 9624d605e0f5bb2f18faf2b7566b3aa433aa44f2 (ap-c3-eg160: combo3 with EndGhost radius 160 m) | docker PASS p99 5.4 ms | scored on builders-4, receipt BB-5DC5D583 | **6.45 (new best; PICKED as final entry at ~03:17 AM)** |
 | 83 | 3740c301df9f76ef7172b43e4a4ddd815c9466b8 (ap-c3-eg120: combo3 with EndGhost radius 120 m) | docker PASS p99 9.8 ms | scored on builders-4, receipt BB-D8A2C483 | 6.14 |
-| 84 | f94e40002b934b1484f235c1dc7539936023df21 (ap-c3-eg180: EndGhost radius 180 m; docker PASS p99 3.2 ms) | docker PASS | submitted, receipt BB-663E0495, awaiting score | pending |
+| 84 | f94e40002b934b1484f235c1dc7539936023df21 (ap-c3-eg180: EndGhost radius 180 m; docker PASS p99 3.2 ms) | docker PASS | scored on builders-4, receipt BB-663E0495 | 6.30 |
+| 85 | 2ff856f7c06f18840f8fb0fc3a4c0ae621287bd8 (ap-c3-eg200: EndGhost radius 200 m; docker PASS p99 4.3 ms) | docker PASS | submitted, receipt BB-7585BCCA, awaiting score | pending |
