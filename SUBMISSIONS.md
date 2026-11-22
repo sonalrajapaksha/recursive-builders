@@ -66,4 +66,5 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 59 | ac58e6ccc1a46d62a9e7e621cc0bed89618f108b (ds2-dropgate) | docker PASS | scored, receipt BB-1E2F544A | 6.15 (-0.20 vs dronestrict; dropped) |
 | 60 | dd3731aeb47fa01437d490bb720635bf7efbcb77 (dr-hyst: laser charge in progress may finish within 65 m) | docker PASS | scored 6.35 but labelled 'Scored under a previous version' (see E121) |
 | 61 | dd3731aeb47fa01437d490bb720635bf7efbcb77 (dr-hyst, resubmitted on the new 96-seed scorer) | docker PASS | scored on builders-4, receipt BB-F8B41B8E | 5.42 (below dronestrict 5.60) |
-| 62 | 863fa4e85d7fefb93fec4d0bbaaa8a4b61cad967 (tv-dv600, no drone laser, on builders-4) | docker PASS | submitted, receipt BB-77CEA322, awaiting score | pending |
+| 62 | 863fa4e85d7fefb93fec4d0bbaaa8a4b61cad967 (tv-dv600, no drone laser, on builders-4) | docker PASS | scored on builders-4, receipt BB-77CEA322 | 5.33 (below dronestrict 5.60: drone laser helps ~+0.27) |
+| 63 | waiprotein/mech-royale-bot 42c594fc51f2fecd457c984cb18f0ede9d3cf306 (third-party MIT giddy fork, reference only, builders-4) | not ours | submitted, receipt BB-E03246D7, awaiting score | pending |
