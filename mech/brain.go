@@ -159,6 +159,7 @@ type Params struct {
 	DroneRange  float64
 	DroneHP     float64
 	DroneQuiet  float64
+	DroneStand  float64
 }
 
 func DefaultParams() Params {
@@ -1371,6 +1372,9 @@ func (b *Brain) prefRange(me *Self, t *Track) float64 {
 		r = b.P.LaserRange
 	}
 	if t.Kind == "npc" {
+		if r, ok := b.droneStand(me, t, laser); ok {
+			return r
+		}
 		return 58
 	}
 	if light == nil {
