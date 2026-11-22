@@ -64,4 +64,4 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 57 | 59d4e750c776a7d7797ea8c5040ffad6544853b7 (ds2-farm: gated reach 150->210) | docker PASS | scored, receipt BB-777BA5D5 | 6.06 (-0.29 vs dronestrict; dropped) |
 | 58 | 590d913621b65a8d834edc7bcd5b1904e76bbfe0 (tv-dronestrict3: 55/0.75/160) | docker PASS | scored, receipt BB-E9CEBCEA | 6.35 (ties dronestrict; quiet radius 110 vs 160 no effect) |
 | 59 | ac58e6ccc1a46d62a9e7e621cc0bed89618f108b (ds2-dropgate) | docker PASS | scored, receipt BB-1E2F544A | 6.15 (-0.20 vs dronestrict; dropped) |
-| 60 | dd3731aeb47fa01437d490bb720635bf7efbcb77 (dr-hyst: laser charge in progress may finish within 65 m) | docker PASS | submitted, receipt BB-DEA576AE, awaiting score | pending |
+| 60 | dd3731aeb47fa01437d490bb720635bf7efbcb77 (dr-hyst: laser charge in progress may finish within 65 m) | docker PASS | scored 6.35 but labelled 'Scored under a previous version' (see E121) |
