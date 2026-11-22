@@ -159,12 +159,16 @@ type Params struct {
 	DroneRange  float64
 	DroneHP     float64
 	DroneQuiet  float64
+	FarmReach   float64
+	FarmQuiet   float64
+	FarmQuietS  float64
+	FarmGateHP  float64
 }
 
 func DefaultParams() Params {
 	p := Params{RetreatHP: 0.38, RecoverHP: 0.8, GunRange: 85, LightRange: 28, LaserRange: 85, EngageDist: 60, FarmNPC: true, Explore: false,
 		Ghost: true, HomeExpo: 120, LootRadius: 90, CrateUntil: 150, UseDrops: true, Dodge: true, NoMortar: true,
-		Peek: true, LaserFirst: false, CrowdHide: true, Practice: true, DropV1: 170, DropV2: 260, DropWin: 25, DroneRange: 75, DroneHP: 0.6, DroneQuiet: 80}
+		Peek: true, LaserFirst: false, CrowdHide: true, Practice: true, DropV1: 170, DropV2: 260, DropWin: 25, DroneRange: 75, DroneHP: 0.6, DroneQuiet: 80, FarmQuiet: 110, FarmQuietS: 4, FarmGateHP: 0.75}
 
 	p.LaserFirst = true
 
@@ -1736,8 +1740,9 @@ func (b *Brain) chooseLoot(o *Obs, hpFrac float64, danger bool) *lootChoice {
 	if me.Cubes >= b.cubeCap() {
 		cubeV = 25
 	}
+	farmR := b.farmReach(hpFrac)
 	for _, c := range b.cubes {
-		if hyp(c.Pos[0]-x, c.Pos[1]-y) < math.Max(60, b.P.LootRadius*0.7) {
+		if hyp(c.Pos[0]-x, c.Pos[1]-y) < math.Max(60, farmR*0.7) {
 			consider("cube", c.ID, c.Pos, cubeV)
 		}
 	}
@@ -1747,13 +1752,13 @@ func (b *Brain) chooseLoot(o *Obs, hpFrac float64, danger bool) *lootChoice {
 	}
 	if hpFrac > farmHP && !danger && now < b.P.CrateUntil {
 		for _, c := range b.crates {
-			if hyp(c.Pos[0]-x, c.Pos[1]-y) < b.P.LootRadius {
+			if hyp(c.Pos[0]-x, c.Pos[1]-y) < farmR {
 				consider("crate", c.ID, c.Pos, cubeV*0.6)
 			}
 		}
 		if b.P.FarmNPC && me.Cubes < b.cubeCap() {
 			for _, n := range b.npcs {
-				if now-n.Seen < 12 && hyp(n.Pos[0]-x, n.Pos[1]-y) < b.P.LootRadius {
+				if now-n.Seen < 12 && hyp(n.Pos[0]-x, n.Pos[1]-y) < farmR {
 					consider("npc", n.ID, n.Pos, 85)
 				}
 			}
