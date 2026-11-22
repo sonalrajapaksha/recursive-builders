@@ -155,6 +155,9 @@ type Params struct {
 	DropV1      float64
 	DropV2      float64
 	DropWin     float64
+	PreDrop     float64
+	HealDrop    float64
+	ZoneCover   float64
 }
 
 func DefaultParams() Params {
@@ -1539,6 +1542,11 @@ func (b *Brain) coverMove(o *Obs, seen []*Track, mx, my *float64) bool {
 			checked++
 			if hidden(cx, cy) {
 				sc := steps*2 + b.zonePenalty(&o.Zone, cx, cy)
+				if zc := &o.Zone; b.P.ZoneCover > 0 && zc.NextRadius <= 140 {
+					// Late phases: prefer cover inside the next circle so the
+					// converging squad cannot pin us against the shrinking edge.
+					sc += math.Max(0, hyp(cx-zc.NextCenter[0], cy-zc.NextCenter[1])-zc.NextRadius*0.8) * b.P.ZoneCover
+				}
 				near := math.Inf(1)
 				for _, t := range threats {
 					near = math.Min(near, hyp(t.Pos[0]-cx, t.Pos[1]-cy))
