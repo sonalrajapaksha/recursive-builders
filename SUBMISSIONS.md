@@ -46,4 +46,4 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 39 | 881288a9d3d0a3cb8ac5678b13367a8b1895ae65 (struct-ghost: dv600 + Practice=false, keep Ghost/sneak profile all match) | docker PASS | scored, receipt BB-BB2C3B11 | 5.23 (-1.02 vs dv600; FALSIFIED) |
 | 40 | cbaaf04380e111791067d5e198a13528bda5ab1f (tv-dloot220: dv600 drops + LootRadius 220) | docker PASS | scored, receipt BB-708261B0 | 6.06 (-0.19 vs dv600; dropped) |
 | 41 | b89c083b87a132b1b76f77c3a05591a7829a9b6f (dv600-regen: tv-dv600 + gx-kill-regen) | docker PASS | scored, receipt BB-27E79305 | 6.25 (ties dv600; regen no effect) |
-| 42 | e22f91187ab965686ee92f3d04e4dc113c63c554 (dv600-healdrop: Opus design, retreat to landing supply drop) | docker PASS | submitted, receipt BB-3B48C147, awaiting score | pending |
+| 42 | e22f91187ab965686ee92f3d04e4dc113c63c554 (dv600-healdrop: Opus design, retreat to landing supply drop) | docker PASS | scored, receipt BB-3B48C147 | 6.19 (-0.06 vs dv600; dropped) |
