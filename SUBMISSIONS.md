@@ -87,4 +87,4 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 80 | 790b00c37c0390c64709ac57fcf32469078d9e1f (ap-combo-ca: CoverHeal + AccelLead on) | docker PASS | scored on builders-4, receipt BB-006A0E18 | 6.20 |
 | 81 | 0bb1bba6ab373319091f9ffa6ce2af1eeed41474 (ap-c3-lo: combo3 + CoverHeal 50/85; docker PASS p99 3.8 ms) | docker PASS | scored on builders-4, receipt BB-0207EC75 | 6.14 |
 | 82 | 9624d605e0f5bb2f18faf2b7566b3aa433aa44f2 (ap-c3-eg160: combo3 with EndGhost radius 160 m) | docker PASS p99 5.4 ms | scored on builders-4, receipt BB-5DC5D583 | **6.45 (new best; PICKED as final entry at ~03:17 AM)** |
-| 83 | 3740c301df9f76ef7172b43e4a4ddd815c9466b8 (ap-c3-eg120: combo3 with EndGhost radius 120 m) | docker PASS p99 9.8 ms | submitted, receipt BB-D8A2C483, awaiting score | pending |
+| 83 | 3740c301df9f76ef7172b43e4a4ddd815c9466b8 (ap-c3-eg120: combo3 with EndGhost radius 120 m) | docker PASS p99 9.8 ms | scored on builders-4, receipt BB-D8A2C483 | 6.14 |
