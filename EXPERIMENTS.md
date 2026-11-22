@@ -68,3 +68,4 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E64 | official tv-dfarm35 (9b7d6fd) = 6.25, FarmHP has no effect. Submitted waiprotein/mech-royale-bot 42c594f as a reference measurement at the user request (MIT fork; not our code). tv-dloot220 cbaaf04 still queued. |
 | E65 | waiprotein reference = 6.19 (about base). Submitted struct-ghost 881288a: structural test of disabling the squad profile swap. Evidence so far says passivity loses (E6 2.15), so low odds. |
 | E66 | official struct-ghost (881288a) = 5.23, -1.02 vs 6.25. Keeping the Ghost/sneak profile in practice loses clearly; the squad (fight-everything) profile is right for practice. Best stays dv600 6.25. 0/6 quota used this hour; tv-dloot220 cbaaf04 queued. |
+| E67 | Haiku watcher (Orca) works: reads the team page, wakes the coordinator when a slot is free (it misreported the final pick once; verify it myself). Submitted tv-dloot220 cbaaf04. |
