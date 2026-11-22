@@ -70,3 +70,4 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E66 | official struct-ghost (881288a) = 5.23, -1.02 vs 6.25. Keeping the Ghost/sneak profile in practice loses clearly; the squad (fight-everything) profile is right for practice. Best stays dv600 6.25. 0/6 quota used this hour; tv-dloot220 cbaaf04 queued. |
 | E67 | Haiku watcher (Orca) works: reads the team page, wakes the coordinator when a slot is free (it misreported the final pick once; verify it myself). Submitted tv-dloot220 cbaaf04. |
 | E68 | official tv-dloot220 (cbaaf04) = 6.06, -0.19 vs dv600: wider loot radius hurts. Final pick confirmed = tv-dv600 BB-64EFB59E 6.25. Next: stack gx-kill-regen on dv600 when a slot opens (~9:30 PM site time). |
+| E69 | built dv600-regen b89c083b87a132b1b76f77c3a05591a7829a9b6f (tv-dv600 + gx-kill-regen cherry-pick, docker PASS, pushed). To submit when a slot opens. |
