@@ -49,4 +49,5 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 42 | e22f91187ab965686ee92f3d04e4dc113c63c554 (dv600-healdrop: Opus design, retreat to landing supply drop) | docker PASS | scored, receipt BB-3B48C147 | 6.19 (-0.06 vs dv600; dropped) |
 | 43 | b0ce21dae94fde4c795391f39c4a8128626a2fd1 (dv600-predrop: walk to next_center before each drop call) | docker PASS | scored, receipt BB-8F12CD09 | 5.71 (-0.54 vs dv600; FALSIFIED) |
 | 44 | 829200b919ec9591c2016a9b26ece9bc677a3b05 (dv600-zonecover: inward cover once next_radius<=140) | docker PASS | scored, receipt BB-2D094C73 | 6.19 (-0.06 vs dv600; dropped) |
-| 45 | 9515faa1f1a03b0b41e3e577f68958856e314247 (tv-s1: salt-base 2b6fa16, dv600 values, Salt 1) | docker PASS | submitted, receipt BB-4FFCCD94, awaiting score | pending |
+| 45 | 9515faa1f1a03b0b41e3e577f68958856e314247 (tv-s1: salt-base 2b6fa16, dv600 values, Salt 1) | docker PASS | scored, receipt BB-4FFCCD94 | 5.65 (salt draw; big spread) |
+| 46 | 16e14ea95145424f29735e7753bc712a94d7a239 (tv-s2: Salt 2) | docker PASS | submitted, receipt BB-9CE0F27F, awaiting score | pending |
