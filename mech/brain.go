@@ -96,6 +96,7 @@ type Brain struct {
 	otherDead          int
 	stickID            int
 	stickAt, loseAt    float64
+	kiteS              kiteState
 }
 
 type Params struct {
@@ -155,6 +156,7 @@ type Params struct {
 	DropV1      float64
 	DropV2      float64
 	DropWin     float64
+	Kite        bool
 }
 
 func DefaultParams() Params {
@@ -703,6 +705,8 @@ func (b *Brain) step(o *Obs, act *Action) {
 		mx, my = b.travel(me, zgx, zgy)
 		boost = (!me.InZone || now+tNeed >= deadline) && me.Energy > 5
 		mode = "zone"
+	case b.P.Kite && !b.retreat && !finishing && b.kite(o, seen, hpFrac, &mx, &my):
+		mode = "kite"
 	case b.retreat && !finishing && !late:
 		if b.coverMove(o, seen, &mx, &my) {
 			boost = me.Energy > 10 && (mx != 0 || my != 0)
