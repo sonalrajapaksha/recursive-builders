@@ -159,12 +159,14 @@ type Params struct {
 	DroneRange  float64
 	DroneHP     float64
 	DroneQuiet  float64
+	DroneLight  bool
+	DroneLightR float64
 }
 
 func DefaultParams() Params {
 	p := Params{RetreatHP: 0.38, RecoverHP: 0.8, GunRange: 85, LightRange: 28, LaserRange: 85, EngageDist: 60, FarmNPC: true, Explore: false,
 		Ghost: true, HomeExpo: 120, LootRadius: 90, CrateUntil: 150, UseDrops: true, Dodge: true, NoMortar: true,
-		Peek: true, LaserFirst: false, CrowdHide: true, Practice: true, DropV1: 170, DropV2: 260, DropWin: 25, DroneRange: 75, DroneHP: 0.6, DroneQuiet: 80}
+		Peek: true, LaserFirst: false, CrowdHide: true, Practice: true, DropV1: 170, DropV2: 260, DropWin: 25, DroneRange: 75, DroneHP: 0.6, DroneQuiet: 80, DroneLightR: 36}
 
 	p.LaserFirst = true
 
@@ -822,6 +824,8 @@ func (b *Brain) step(o *Obs, act *Action) {
 					farmPos = &cp
 					if d < 12 {
 						mx, my = (x-lc.pos[0])/math.Max(d, 0.1), (y-lc.pos[1])/math.Max(d, 0.1)
+					} else if d > b.P.DroneLightR+2 && b.droneLightOK(me) {
+						mx, my = b.travel(me, lc.pos[0], lc.pos[1])
 					}
 				} else {
 					mx, my = b.travel(me, lc.pos[0], lc.pos[1])
@@ -1371,6 +1375,9 @@ func (b *Brain) prefRange(me *Self, t *Track) float64 {
 		r = b.P.LaserRange
 	}
 	if t.Kind == "npc" {
+		if b.droneLightOK(me) {
+			return b.P.DroneLightR
+		}
 		return 58
 	}
 	if light == nil {
