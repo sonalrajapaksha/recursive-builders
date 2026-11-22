@@ -185,7 +185,7 @@ func DefaultParams() Params {
 		CoverHeal:      true,
 		CoverHealStart: 0.60,
 		CoverHealClear: 0.90,
-		EndGhost:       true,
+		EndGhost:       false,
 		AccelLead:      true,
 		Name:           "apex-go",
 		EngageRatio:    1.25,
