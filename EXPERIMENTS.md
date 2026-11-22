@@ -116,3 +116,4 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E112 | official ds2-wpn (e42892c) = 6.27, -0.08 vs 6.35: closing in with lightning on drones/crates does not help. Next ds2-farm, strict3, ds2-dropgate. |
 | E113 | submitted ds2-farm (BB-777BA5D5). Queue: strict3 590d913, ds2-dropgate ac58e6c. |
 | E114 | official ds2-farm (59d4e75) = 6.06, -0.29: wider farm reach hurts even when gated (like LootRadius 220 = 6.06). Reach/farming expansion closed. Remaining: strict3, ds2-dropgate. |
+| E115 | submitted tv-dronestrict3 (BB-E9CEBCEA). Remaining after it: ds2-dropgate ac58e6c. |
