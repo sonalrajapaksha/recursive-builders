@@ -92,3 +92,4 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E88 | submitted dv600-roof (BB-521E15CE). roof-lite 2cd669f next. |
 | E89 | official dv600-roof (477ce20) = 4.69, -1.56 vs 6.25: committing to roofs early loses badly (passivity + untested climb, and/or hunters reach roofs). Same pattern as the hider (2.15), Ghost-in-practice (5.23). Submitting roof-lite (climbs only after contact) next as the last test of the idea at ~5:06 PM site time. |
 | E90 | submitted dv600-roof-lite (BB-1CE6B233), last test of the roof idea. |
+| E91 | official dv600-roof-lite (2cd669f) = 4.58, -1.67. Even the contact-only climb loses as much as the full fortress, so the climb itself (failed/stuck climbs, exposure while jetting, energy spent) is the likely cost, not just early commitment. ROOF IDEA CLOSED: 4.69 / 4.58 vs 6.25. Remaining unexplored: zone kiting, drone hunting. Final pick stays tv-dv600 (BB-64EFB59E 6.25). |
