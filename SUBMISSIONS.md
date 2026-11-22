@@ -56,4 +56,5 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 49 | 2cd669ff2155b19b7d20f810edd174663149e680 (dv600-roof-lite: Roof=2, climbs only after contact) | docker PASS | scored, receipt BB-1CE6B233 | 4.58 (-1.67 vs dv600; FALSIFIED) |
 | 50 | 54a8db93c9ffaff677bd49e981f17b5fece4f872 (dv600-drone: DroneLaser) | docker PASS | scored, receipt BB-5E6CF520 | **6.29 (+0.04 vs dv600): NEW BEST** |
 | 51 | b67834990a65c9932e211e1d05d1af306b5fbf48 (dv600-kite: zone kiting) | docker PASS | scored, receipt BB-F72C08F5 | 5.98 (-0.27 vs dv600; dropped) |
-| 52 | 13bd97c6d3311e5b1c4677c69f7653a1a3cbcaf4 (tv-dronewide: range 120, HP 0.5, quiet 60) | docker PASS | submitted, receipt BB-DFF7A95C, awaiting score | pending |
+| 52 | 13bd97c6d3311e5b1c4677c69f7653a1a3cbcaf4 (tv-dronewide: range 120, HP 0.5, quiet 60) | docker PASS | scored, receipt BB-DFF7A95C | 6.29 (ties dv600-drone; gates don't matter) |
+| 53 | 5397bc5af0ce9ed4f1bb07bd1c887f7605ab5be5 (tv-dronestrict: range 55, HP 0.75, quiet 110) | docker PASS | submitted, receipt BB-C97BAD66, awaiting score | pending |

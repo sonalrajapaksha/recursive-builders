@@ -101,3 +101,4 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E97 | official dv600-kite (b678349) = 5.98, -0.27: zone kiting loses; closed. Drone-laser (6.29) is the only live lead; next: parametrise its gates (range 75, HP 0.6, mech-seen 80 m) and test larger/smaller. |
 | E98 | built drone-base 0f144a9 (dv600-drone + DroneRange/DroneHP/DroneQuiet params, defaults 75/0.6/80) and variants tv-dronewide (120/0.5/60) and tv-dronestrict (55/0.75/110) via tools/mkvariant.sh. Submit when built and a slot is free. |
 | E99 | submitted tv-dronewide (BB-DFF7A95C); tv-dronestrict 5397bc5 next. |
+| E100 | official tv-dronewide (13bd97c) = 6.29, ties dv600-drone (earlier submission keeps priority). Gate widening has no effect. Submitted tv-dronestrict (BB-C97BAD66). |
