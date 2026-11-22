@@ -52,3 +52,4 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 45 | 9515faa1f1a03b0b41e3e577f68958856e314247 (tv-s1: salt-base 2b6fa16, dv600 values, Salt 1) | docker PASS | scored, receipt BB-4FFCCD94 | 5.65 (salt draw; big spread) |
 | 46 | 16e14ea95145424f29735e7753bc712a94d7a239 (tv-s2: Salt 2) | docker PASS | scored, receipt BB-9CE0F27F | 5.54 (salt draw) |
 | 47 | 40a1791d9b144a1937c9e0696cab7db96f9638f8 (tv-s3: Salt 3) | docker PASS | scored, receipt BB-27D6721D | 5.38 (salt draw) |
+| 48 | 477ce204451a51325467150b8cfcdc1fcd6cb673 (dv600-roof: rooftop fortress, Roof=1) | docker PASS | submitted, receipt BB-521E15CE, awaiting score | pending |
