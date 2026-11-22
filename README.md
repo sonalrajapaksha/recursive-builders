@@ -60,3 +60,10 @@ Attach `debug` to any action (protocol.md §6) to record lines, points, and labe
 ## Our bot (recursive-builders)
 Root `Dockerfile` runs `bot.py`. See PROGRESS.md, EXPERIMENTS.md, SUBMISSIONS.md, INTERFACE.md.
 Build: `docker build --platform linux/amd64 -t rb-bot .`; check per protocol.md §1.
+
+## Attribution (vendored bot)
+
+The bot built from this branch is **Apex-Go** by ahmad-ovh, vendored unmodified from
+https://github.com/ahmad-ovh/Buildathon at commit f29e4d3b8316aefb42d4b5848bf1c0e60a7d2675 (MIT License, Copyright (c) 2026 ahmad-ovh;
+the LICENSE file at the repository root is theirs, verbatim). Only the Go tree needed to build
+(cmd/mechbot, internal/bot, internal/proto, internal/world, go.mod, Dockerfile) was copied.
