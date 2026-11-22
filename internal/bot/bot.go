@@ -22,6 +22,7 @@ type Params struct {
 	RetreatHP     float64 // retreat to cover below this HP fraction when someone can hurt us
 	CoverHeal     bool    // seek shelter for regeneration before being forced to retreat
 	ReturnHP      float64 // come back out above this HP fraction
+	AccelLead     bool    // add capped acceleration correction to gun lead
 	LeadDamp      float64 // how much of a target's velocity to trust for long flight times
 	GunMaxRange   float64 // never fire the gun at mechs beyond this
 	StrafeMin     float64 // seconds between strafe direction changes (min)
@@ -333,6 +334,8 @@ type Track struct {
 	ViewT       float64 // last time it was inside our own field of view (not just remembered)
 	EngT        float64 // last time it counted as engaged with us
 	LaserFiredT float64 // last time we saw this mech fire a laser beam (for cooldown punish window)
+
+	accel [2]float64 // smoothed horizontal acceleration from consecutive observations
 
 	// recent motion, for choosing how to lead it (see lead.go)
 	hist     [trkHist]trkSample
@@ -861,6 +864,9 @@ func (b *Bot) observe(o *proto.Obs) {
 		}
 		if b.t-tr.LastSeen > 6 {
 			tr.SeenT0 = b.t
+		}
+		if b.P.AccelLead && !tr.NPC {
+			tr.updateAccel(m.Vel, b.t-tr.LastSeen)
 		}
 		tr.Pos, tr.Vel, tr.Aim = m.Pos, m.Vel, m.Aim
 		if m.MaxHP > 0 {

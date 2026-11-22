@@ -31,6 +31,7 @@ type aimTarget struct {
 	// the laser is instant and keeps the plain latency lead)
 	gunLead    float64
 	gunLeadSet bool
+	gunAccel   [2]float64
 	// Apex-Go v2: target vulnerability multipliers from hello.config
 	rear       bool // enemy back is facing us (mech.rear_mult)
 	hasMortar  bool // enemy carries a mortar (weapons.laser.cookoff)
@@ -56,6 +57,9 @@ func (b *Bot) targetOf(tr *Track) aimTarget {
 	}
 	if b.P.LeadPersist || b.P.LeadCum {
 		at.gunLead, at.gunLeadSet = b.gunLead(tr), true
+	}
+	if b.P.AccelLead && tr.Listed {
+		at.gunAccel = tr.accel
 	}
 	return at
 }
@@ -94,6 +98,11 @@ func (b *Bot) solveDirectLat(tg aimTarget, speed, originH, lat float64) shot {
 		damp := b.leadDamp(tf)
 		px = tg.pos[0] + tg.vel[0]*(lat+tf*damp)*k
 		py = tg.pos[1] + tg.vel[1]*(lat+tf*damp)*k
+		if speed > 0 && tg.gunAccel != [2]float64{} {
+			dx, dy := accelCorrection(tg.gunAccel, lat+tf)
+			px += dx * k
+			py += dy * k
+		}
 		vz := clamp(tg.vel[2], -15, 12)
 		pz = tg.pos[2] + tg.centerZ + vz*(lat+tf)*0.6
 		if speed <= 0 {
@@ -118,6 +127,16 @@ func (b *Bot) solveDirectLat(tg aimTarget, speed, originH, lat float64) shot {
 		}
 	} else {
 		s.clear = true
+	}
+	return s
+}
+
+// solveGun keeps the velocity-only shot if an acceleration correction would obstruct it.
+func (b *Bot) solveGun(tg aimTarget, speed, lat float64) shot {
+	s := b.solveDirectLat(tg, speed, b.muzzleH, lat)
+	if !s.clear && tg.gunAccel != [2]float64{} {
+		tg.gunAccel = [2]float64{}
+		return b.solveDirectLat(tg, speed, b.muzzleH, lat)
 	}
 	return s
 }
@@ -256,9 +275,10 @@ func (b *Bot) engage(act *proto.Action, tg aimTarget, hasLOS, losRecent bool, hp
 				gunLat = b.decide
 			}
 		}
-		gunS = b.solveDirectLat(gunTg, stat(b.slots[gunI].stats, "speed", 252), b.muzzleH, gunLat)
+		speed := stat(b.slots[gunI].stats, "speed", 252)
+		gunS = b.solveGun(gunTg, speed, gunLat)
 		if !gunS.clear && headOK {
-			if alt := b.solveDirectLat(gunHead, stat(b.slots[gunI].stats, "speed", 252), b.muzzleH, gunLat); alt.clear {
+			if alt := b.solveGun(gunHead, speed, gunLat); alt.clear {
 				gunS = alt
 				pitchTol = 0.7
 			}
