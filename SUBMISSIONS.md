@@ -73,3 +73,4 @@ Note: site allows only ONE submission in scoring at a time; wait for the current
 | 66 | 5ad09e9aaa5d74e8003d68826136c227dd5018be (av-pur10: gear_pursuit_s 10) | docker PASS | scored on builders-4, receipt BB-8C5FA444 | 5.82 (-0.34 vs automata-base) |
 | 67 | 2c900b1821ba0750c0f7f4e03cf2620097ec83ef (av-harv60: harvest_site_s 60) | docker PASS | scored on builders-4, receipt BB-36F1F8F1 | 5.77 (-0.39 vs automata-base) |
 | 68 | 25dcf3677b06351c09f18a53c7764fe2a1f75b6b (automata-base RESUBMITTED, identical commit, variance test) | docker PASS | scored on builders-4, receipt BB-70F341B1 | 6.16 (identical to BB-B33647E6: scorer is deterministic) |
+| 69 | 89c7522a1a531391b2955dfd75f6942ada19e824 (ar-all: automata-base + 3 audit fixes) | docker PASS | submitted, receipt BB-7BC7C86A, awaiting score | pending |
