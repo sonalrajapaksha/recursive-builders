@@ -183,8 +183,8 @@ type Params struct {
 func DefaultParams() Params {
 	return Params{
 		CoverHeal:      true,
-		CoverHealStart: 0.60,
-		CoverHealClear: 0.90,
+		CoverHealStart: 0.50,
+		CoverHealClear: 0.85,
 		EndGhost:       true,
 		AccelLead:      true,
 		Name:           "apex-go",

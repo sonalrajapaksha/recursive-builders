@@ -7,7 +7,7 @@ import (
 )
 
 func TestCoverHealGate(t *testing.T) {
-	b := Bot{P: DefaultParams(), hp: 590, maxHP: 1000}
+	b := Bot{P: DefaultParams(), hp: 490, maxHP: 1000}
 	b.P.CoverHeal = false
 	if b.coverHealActive(zoneInfo{}, 81) {
 		t.Fatal("disabled CoverHeal gate activated")
@@ -17,19 +17,19 @@ func TestCoverHealGate(t *testing.T) {
 		t.Fatal("CoverHeal should yield to nearby mechs and urgent rotation")
 	}
 	if !b.coverHealActive(zoneInfo{}, 81) {
-		t.Fatal("CoverHeal did not activate below 60% HP")
+		t.Fatal("CoverHeal did not activate below 50% HP")
 	}
 	b.hp = 700
 	if b.coverHealActive(zoneInfo{}, 50) || !b.coverHealActive(zoneInfo{}, 100) {
 		t.Fatal("CoverHeal should pause and resume until healed")
 	}
-	b.hp = 900
+	b.hp = 850
 	if b.coverHealActive(zoneInfo{}, 100) {
-		t.Fatal("CoverHeal persisted at 90% HP")
+		t.Fatal("CoverHeal persisted at 85% HP")
 	}
-	b.hp = 600
+	b.hp = 500
 	if b.coverHealActive(zoneInfo{}, 100) {
-		t.Fatal("CoverHeal reactivated at 60% HP")
+		t.Fatal("CoverHeal reactivated at 50% HP")
 	}
 }
 
