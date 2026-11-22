@@ -113,3 +113,4 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E109 | submitted tv-cratelaser (BB-7699498A) ahead of strict3 (it extends the best build with a reasoned mechanism). Queue: ds2-wpn, ds2-farm, strict3, ds2-dropgate. |
 | E110 | official tv-cratelaser (74cb322) = 6.02, -0.33 vs 6.35: laser on crates hurts (crates are plentiful and spread out, so charging/standing to shoot them costs time and the 140 m charge sound draws hunters; drones are rare and worth 2 cubes). Crate extension closed. Next ds2-wpn, ds2-farm, strict3, ds2-dropgate. Final pick stays tv-dronestrict 6.35. |
 | E111 | submitted ds2-wpn (BB-DF387C83). Queue: ds2-farm 59d4e75, strict3 590d913, ds2-dropgate ac58e6c. |
+| E112 | official ds2-wpn (e42892c) = 6.27, -0.08 vs 6.35: closing in with lightning on drones/crates does not help. Next ds2-farm, strict3, ds2-dropgate. |
