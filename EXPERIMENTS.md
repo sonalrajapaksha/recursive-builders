@@ -77,3 +77,4 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E73 | Opus worker built 3 variants off tv-dv600 (docker PASS): dv600-healdrop e22f911 (rank 1: retreat to a landing supply drop), dv600-predrop b0ce21d (rank 2: walk to next_center before each drop call), dv600-zonecover 829200b (rank 3: inward cover once next_radius<=140). Queue order: healdrop, predrop, zonecover. |
 | E74 | submitted dv600-healdrop e22f911 (receipt BB-3B48C147). Next in queue: dv600-predrop b0ce21d, dv600-zonecover 829200b. |
 | E75 | official dv600-healdrop (e22f911) = 6.19, -0.06 vs 6.25: retreating to a landing drop does not help. Next dv600-predrop b0ce21d when slot opens (~4:05 PM site time). |
+| E76 | submitted dv600-predrop b0ce21d (receipt BB-8F12CD09). Watcher polling ran fast vs wall clock; used a background sleep timer to wait for the slot instead. Next: dv600-zonecover 829200b. |
