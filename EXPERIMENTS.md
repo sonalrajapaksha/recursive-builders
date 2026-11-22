@@ -102,3 +102,4 @@ Known: nav A* replan can hit 12ms cap; replay latency tests fall back to no-nav 
 | E98 | built drone-base 0f144a9 (dv600-drone + DroneRange/DroneHP/DroneQuiet params, defaults 75/0.6/80) and variants tv-dronewide (120/0.5/60) and tv-dronestrict (55/0.75/110) via tools/mkvariant.sh. Submit when built and a slot is free. |
 | E99 | submitted tv-dronewide (BB-DFF7A95C); tv-dronestrict 5397bc5 next. |
 | E100 | official tv-dronewide (13bd97c) = 6.29, ties dv600-drone (earlier submission keeps priority). Gate widening has no effect. Submitted tv-dronestrict (BB-C97BAD66). |
+| E101 | official tv-dronestrict (5397bc5) = 6.35: NEW BEST. Stricter drone-laser gates (range 55, HP>0.75, no mech within 110 m) beat default (6.29) and wide (6.29). Direction: stricter still. Building tv-dronestrict2 (range 40, HP 0.85, quiet 140) and tv-dronestrict3 (range 55, HP 0.75, quiet 160). Final pick NOT changed by me (needs user OK): tv-dv600 remains the pick. |
