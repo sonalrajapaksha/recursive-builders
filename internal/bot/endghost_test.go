@@ -8,16 +8,16 @@ import (
 
 func TestEndGhostGate(t *testing.T) {
 	b := Bot{P: DefaultParams(), o: &proto.Obs{}, st: stance{name: "squad"}}
-	b.o.Zone.NextRadius = 140
+	b.o.Zone.NextRadius = b.P.EndGhostRadius
 	b.P.EndGhost = false
 	if b.endGhostActive(zoneInfo{}) {
 		t.Fatal("disabled EndGhost gate activated")
 	}
 	b.P.EndGhost = true
 	if !b.endGhostActive(zoneInfo{}) || b.endGhostActive(zoneInfo{urgent: true}) {
-		t.Fatal("EndGhost must activate at 140 m and yield to urgent rotation")
+		t.Fatal("EndGhost must activate at its radius threshold and yield to urgent rotation")
 	}
-	b.o.Zone.NextRadius = 141
+	b.o.Zone.NextRadius = b.P.EndGhostRadius + 1
 	if b.endGhostActive(zoneInfo{}) {
 		t.Fatal("EndGhost activated outside its radius threshold")
 	}

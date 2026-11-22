@@ -34,6 +34,7 @@ type Params struct {
 	DropGreed      float64 // 0..1 willingness to contest supply drops
 	Hunt           bool    // chase weaker enemies that are not looking at us
 	EndGhost       bool    // hold cover in late practice circles
+	EndGhostRadius float64 // next circle radius at or below which EndGhost activates
 	PracticeAware  bool    // adapt when the lobby looks like the cooperating house squad
 
 	// free-for-all stance (used once we see mechs dying that we did not kill)
@@ -186,6 +187,7 @@ func DefaultParams() Params {
 		CoverHealStart: 0.60,
 		CoverHealClear: 0.90,
 		EndGhost:       true,
+		EndGhostRadius: 120,
 		AccelLead:      true,
 		Name:           "apex-go",
 		EngageRatio:    1.25,
