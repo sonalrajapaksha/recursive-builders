@@ -155,6 +155,9 @@ type Params struct {
 	DropV1      float64
 	DropV2      float64
 	DropWin     float64
+	PreDrop     float64
+	HealDrop    float64
+	ZoneCover   float64
 }
 
 func DefaultParams() Params {
@@ -704,7 +707,16 @@ func (b *Brain) step(o *Obs, act *Action) {
 		boost = (!me.InZone || now+tNeed >= deadline) && me.Energy > 5
 		mode = "zone"
 	case b.retreat && !finishing && !late:
-		if b.coverMove(o, seen, &mx, &my) {
+		if dp, ok := b.healDrop(o, target, seen); ok {
+			// A supply drop restores full HP (+3 cubes): when hurt and not under
+			// direct fire, it beats hiding to regen against weakest-first hunters.
+			mx, my = b.travel(me, dp[0], dp[1])
+			if hyp(dp[0]-x, dp[1]-y) < 2.5 {
+				mx, my = 0, 0
+			}
+			boost = me.Energy > 10 && (mx != 0 || my != 0)
+			mode = "healdrop"
+		} else if b.coverMove(o, seen, &mx, &my) {
 			boost = me.Energy > 10 && (mx != 0 || my != 0)
 			mode = "cover"
 		} else if target != nil {
@@ -2001,4 +2013,35 @@ func (b *Brain) showsBack(t *Track, x, y float64) bool {
 		arc = 180
 	}
 	return math.Abs(angDiff(t.Aim[0], math.Atan2(y-t.Pos[1], x-t.Pos[0]))) > arc*math.Pi/360+0.1
+}
+
+func (b *Brain) healDrop(o *Obs, target *Track, seen []*Track) (Vec3, bool) {
+	if b.P.HealDrop <= 0 || target != nil || !b.P.UseDrops {
+		return Vec3{}, false
+	}
+	me := &o.Self
+	x, y := me.Pos[0], me.Pos[1]
+	for i := range o.Drops {
+		d := &o.Drops[i]
+		dist := hyp(d.Pos[0]-x, d.Pos[1]-y)
+		if dist > b.P.HealDrop || d.LandsIn > dist/me.Stats.WalkSpeed+3 {
+			continue
+		}
+		if d.Holder != nil && *d.Holder != me.ID {
+			continue
+		}
+		if b.zonePenalty(&o.Zone, d.Pos[0], d.Pos[1]) > 0 {
+			continue
+		}
+		contested := false
+		for _, t := range seen {
+			if b.now-t.Seen < 3 && hyp(t.Pos[0]-d.Pos[0], t.Pos[1]-d.Pos[1]) < 70 {
+				contested = true
+			}
+		}
+		if !contested {
+			return d.Pos, true
+		}
+	}
+	return Vec3{}, false
 }
