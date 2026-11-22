@@ -155,6 +155,9 @@ type Params struct {
 	DropV1      float64
 	DropV2      float64
 	DropWin     float64
+	PreDrop     float64
+	HealDrop    float64
+	ZoneCover   float64
 }
 
 func DefaultParams() Params {
@@ -828,6 +831,12 @@ func (b *Brain) step(o *Obs, act *Action) {
 					mx, my = 0, 0
 				}
 			}
+		} else if b.P.PreDrop > 0 && !danger && b.preDrop(now) && hyp(z.NextCenter[0]-x, z.NextCenter[1]-y) > z.NextRadius*0.3 {
+			// Pre-position toward the circle the zone is closing to shortly before a
+			// supply drop is called: drops land uniformly inside that circle, so its
+			// center minimises expected distance and lets us arrive first.
+			mx, my = b.travel(me, z.NextCenter[0], z.NextCenter[1])
+			mode = "predrop"
 		} else if zdist > 3 && (!b.P.Ghost || z.NextRadius <= 30) {
 			mx, my = b.travel(me, zgx, zgy)
 			mode = "zone-walk"
@@ -2001,4 +2010,13 @@ func (b *Brain) showsBack(t *Track, x, y float64) bool {
 		arc = 180
 	}
 	return math.Abs(angDiff(t.Aim[0], math.Atan2(y-t.Pos[1], x-t.Pos[0]))) > arc*math.Pi/360+0.1
+}
+
+func (b *Brain) preDrop(now float64) bool {
+	for _, t := range b.Cfg.Drops.Times {
+		if now >= t-b.P.PreDrop && now < t {
+			return true
+		}
+	}
+	return false
 }
