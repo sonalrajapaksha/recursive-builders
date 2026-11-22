@@ -96,6 +96,7 @@ type Brain struct {
 	otherDead          int
 	stickID            int
 	stickAt, loseAt    float64
+	roof               roofState
 }
 
 type Params struct {
@@ -155,6 +156,7 @@ type Params struct {
 	DropV1      float64
 	DropV2      float64
 	DropWin     float64
+	Roof        float64
 }
 
 func DefaultParams() Params {
@@ -868,7 +870,15 @@ func (b *Brain) step(o *Obs, act *Action) {
 		boost = true
 	}
 
-	if mode == "escape" {
+	if b.P.Roof > 0 && mode != "escape" && mode != "unstuck" {
+		rj := false
+		if b.roofStep(o, mode, zoneMust, &mx, &my, &boost, &rj) {
+			mode = "roof"
+			act.Jump = act.Jump || rj
+			b.stuckSince = -1
+		}
+	}
+	if mode == "escape" || mode == "roof" {
 		b.stuckSince = -1
 	} else if (mx != 0 || my != 0) && hyp(me.Vel[0], me.Vel[1]) < 1.2 && me.Grounded {
 		if b.stuckSince < 0 {
