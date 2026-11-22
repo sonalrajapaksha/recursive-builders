@@ -29,6 +29,7 @@ type Params struct {
 	WantCubes     int     // stop seeking cubes beyond this
 	DropGreed     float64 // 0..1 willingness to contest supply drops
 	Hunt          bool    // chase weaker enemies that are not looking at us
+	EndGhost      bool    // hold cover in late practice circles
 	PracticeAware bool    // adapt when the lobby looks like the cooperating house squad
 
 	// free-for-all stance (used once we see mechs dying that we did not kill)
@@ -533,6 +534,9 @@ type Bot struct {
 	slipT       float64  // when it was last looked for
 	slipOnT     float64  // last time we decided to slip
 	hm          *hideMap // embedded visibility map (nil if it does not fit this arena)
+	endGhostCell int
+	endGhostZone [3]float64
+	endGhostRetry float64
 	hideCell    int      // hideout we are heading for or sitting in (-1 none)
 	hideOut     hideout
 	hideOutOK   bool
@@ -599,6 +603,7 @@ func New(h *proto.Hello, w *world.World, nav *world.Nav, p Params) *Bot {
 	b.roof.id = -1
 	b.roof.want, b.roof.spot = -1, -1
 	b.roofCoverC = -1
+	b.endGhostCell = -1
 	b.hideCell = -1
 	b.hideOutT = -100
 	b.unquietT = -100

@@ -41,6 +41,9 @@ func (b *Bot) think(act *proto.Action) {
 		b.markSeen()
 	}
 	zi := b.zoneInfo()
+	if b.endGhostStep(act, zi) {
+		return
+	}
 	ths := b.assess()
 	inc := b.gatherIncoming()
 	hpFrac := b.hp / b.maxHP
